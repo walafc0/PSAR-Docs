@@ -1,0 +1,67 @@
+\documentclass[twoside]{article}
+
+\usepackage[sc]{mathpazo}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\linespread{1.05}
+\usepackage{microtype}
+
+\usepackage[hmarginratio=1:1,top=32mm,columnsep=20pt]{geometry}
+\usepackage{multicol}
+\usepackage[hang, small,labelfont=bf,up,textfont=it,up]{caption}
+\usepackage{booktabs}
+\usepackage{float} 
+\usepackage{hyperref}
+
+\usepackage{lettrine}
+\usepackage{paralist}
+
+\usepackage{abstract}
+\renewcommand{\abstractnamefont}{\normalfont\bfseries}
+\renewcommand{\abstracttextfont}{\normalfont\small\itshape}
+
+\usepackage{titlesec}
+\renewcommand\thesection{\Roman{section}}
+\renewcommand\thesubsection{\Roman{subsection}}
+\titleformat{\section}[block]{\large\scshape\centering}{\thesection.}{1em}{}
+\titleformat{\subsection}[block]{\large}{\thesubsection.}{1em}{}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhead{} 
+\fancyfoot{}
+\fancyhead[C]{Monitoring du noyau Linux sur une architecture NUMA $\bullet$ February 2014}
+\fancyfoot[RO,LE]{\thepage}
+
+
+%----------------------------------------------------------------------------------------
+%TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\title{\vspace{-15mm}\fontsize{24pt}{10pt}\selectfont\textbf{Monitoring du noyau Linux sur une architecture NUMA}}
+
+\author{
+\large
+\textsc{Kévin Gallardo, Eric Lombardet, Yu Pei, Pierre-Yves Péneau}\\[2mm] 
+\normalsize Université Pierre et Marie Curie - Jussieu - Paris VI
+\vspace{-5mm}
+}
+\date{}
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+  \maketitle
+
+  \thispagestyle{fancy}
+
+  \begin{abstract}
+    \noindent \input{src/abstract}
+  \end{abstract}
+
+  \begin{multicols}{2}
+    \input{src/intro}
+  \end{multicols}
+
+\end{document}
