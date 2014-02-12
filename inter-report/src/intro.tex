@@ -1,7 +1,7 @@
 \subsection{Introduction}
 
   \lettrine[nindent=0em,lines=3]{L} es systèmes multicoeurs modernes sont
-  maintenant basé sur l'architecture NUMA (Non Uniforme Memory Access). Avec un
+  maintenant basés sur l'architecture NUMA (Non Uniforme Memory Access). Avec un
   système NUMA, les coeurs des processeurs sont regroupés en noeuds. Chaque
   noeud possède un contrôleur mémoire et est interconnecté avec les autres
   noeuds de la machine.
@@ -25,10 +25,10 @@
   allons voir que cet idéal est très difficile, voire impossible à
   obtenir. Néanmoins, il est possible de s'en approcher, en mettant au point des
   algorithmes de répartitions de plus en plus efficaces. La création de ces
-  algorithmes nécessite une connaissance profonde du noyau: comment gère-t-il la
-  création des threads, où sont-ils placés, quelles sont les pages mémoires
-  accédées le plus souvent, par quel noeuds sont-elles contrôlées\ldots C'est en
-  collectant un maximum de renseignements sur ces différents points (et de
+  algorithmes nécessite une connaissance approfondie du noyau: comment gère-t-il
+  la création des threads, où sont-ils placés, quelles sont les pages mémoires
+  accédées le plus souvent, par quels noeuds sont-elles contrôlées\ldots C'est
+  en collectant un maximum de renseignements sur ces différents points (et de
   nombreux autres) que l'on pourra être en mesure d'affiner les solutions de
   répartition de charge. Cette étape de monitoring sera le sujet principal de ce
   projet de master. Nous allons devoir lire et comprendre le fonctionnement à
