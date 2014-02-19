@@ -8,7 +8,7 @@ DIR=mkdir -p $(BIN)
 
 TEX=pdflatex
 PROJECT=report
-TARGET=PSAR_Gallardo_Lombardet_Pei_Peneau
+TARGET=PSAR_Gallardo_Lombardet_Peneau
 
 all:
 	$(DIR)

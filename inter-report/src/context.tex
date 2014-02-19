@@ -18,9 +18,8 @@
     disposons et celle que nous avons mise en place pour ce projet. Notre avons
     à notre disposition une machine AMD Opteron 6172 composée de quatre
     processeurs à douze coeurs chacun cadencés à 2,1GHz et répartis en 8 noeuds
-    avec 32G de mémoire vive. L'architecture des noeuds est la
-    suivante\footnote{Source: \textit{Improving performance on NUMA systems},
-      Baptiste Lepers}:
+    avec 32G de mémoire vive. L'architecture détaillée des noeuds est la
+    suivante:
 
     %% TODO: vérifier l'archi à la main (méga chaud et méga long)
 
@@ -35,7 +34,8 @@
     %%   7:  22  16  22  16  16  22  16  10
 
     \begin{figure}[H]
-      \includegraphics[scale=0.4]{img/numa_topology.png}
+      %% \includegraphics[scale=0.4]{img/numa_topology.png}
+      \includegraphics[scale=0.4]{img/numa_arch_details.png}
       \caption{Topologie de la machine 6172}
       \label{f:numa_topology}
     \end{figure}
