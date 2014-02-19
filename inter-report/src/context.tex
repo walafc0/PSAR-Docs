@@ -40,7 +40,7 @@
       \label{f:numa_topology}
     \end{figure}
 
-    Sur cette machine, nous avons utilisé l'hyperviseur qemu, avec son extension
+    Sur cette machine, nous avons utilisé l'Hyperviseur qemu, avec son extension
     kvm pour afin d'optimiser l'émulation. Afin d'améliorer encore plus cette
     dernière, nous avons utilisé le logiciel virt-manager qui détecte
     automatiquement la configuration matérielle de machine hôte et configure la
@@ -57,14 +57,6 @@
     l'hyperviseur. Afin que le noyau puisse se lancer et avoir une base, nous
     avons installé une première VM, donc nous récupérerons la configuration du
     noyau pour la compilation.
-
-    Cette étape ne fût pas sans difficulté. Nous avons passé plus d'une semaine
-    dessus, alors qu'il s'agit simplement d'installer une machine
-    virtuelle. Malheureusement, l'université à eu des problèmes de réseux, et
-    notamment de ssh la semaine six, le serveur a lui du être mis à jour, il y a
-    eu des souçis de compatibilité de version de logiciels entre nos machines et
-    le serveur, des souçis de virtualisation de matériel\ldots
-
 
   \subsubsection{La gestion de la mémoire}
   
@@ -116,6 +108,22 @@
     d'autres, et essayer d'identifier des \og familles d'applications\fg ayant
     comme trait commun leur comportement vis-à-vis de la mémoire.
     
-  \subsubsection{Placement des threads}
-  
-    TODO
+  \subsubsection{Communication entre threads}
+    
+    Un autre challenge quant à l'optimisation de performance sur architecture 
+    NUMA sont les communications et les echanges de données qui peuvent s'effectuer entre 
+    plusieurs threads de façon simultanée. En effet nous allons devoir fournir un moyen
+    de mesurer ces communications afin que notre noyau 
+    puisse utiliser une politique de placement des thread qui leur permette de 
+    se retrouver les plus proches les uns des autres, de cette façon, leurs échanges 
+    ne se feront (idéalement) que sur un seul et même noeud. Nous effectuerons donc
+    une grande partie de ce monitoring sur les échanges menés par des tubes.
+
+  \subsubsection{But à terme}
+
+    Ce projet PSAR a pour but d'être ensuite intégré au sein d'un projet de plus grande 
+    envergure, en effet, le but ici étant de fournir des informations et des outils
+    de monitoring sur différentes activités du noyau. Cela pour permettre ensuite 
+    l'étude de différents algorithmes des placement mémoires au sein du noyau Linux
+    qui permettra d'optimiser les performances des architectures NUMA (étude d'
+    algorithmes de \og ressorts\fg).
