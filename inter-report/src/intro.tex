@@ -17,12 +17,11 @@
   traitements. En effet, la principale cause de latence n'est pas due au
   \textbf{temps de traitement des données}, mais au \textbf{temps d'accès aux
     données}. Ces accès coûtent entre 10\% et 40\% de temps supplémentaire par
-  rapport aux accès locaux.\footnote{Baptiste Lepers: \textit{Imroving
-      performance on NUMA systems}} Dans une configuration idéale, chaque coeur
-  irait chercher ce dont il a besoin dans la mémoire contrôlée par le noeud dans
-  lequel il se situe. Ainsi, les demandes d'accès distant seraient réduites à
-  néant, et il n'y aurait aucune latence due aux échanges entre les noeuds. Nous
-  allons voir que cet idéal est très difficile, voire impossible à
+  rapport aux accès locaux.\cite{Lepers2014} Dans une configuration idéale,
+  chaque coeur irait chercher ce dont il a besoin dans la mémoire contrôlée par
+  le noeud dans lequel il se situe. Ainsi, les demandes d'accès distant seraient
+  réduites à néant, et il n'y aurait aucune latence due aux échanges entre les
+  noeuds. Nous allons voir que cet idéal est très difficile, voire impossible à
   obtenir. Néanmoins, il est possible de s'en approcher, en mettant au point des
   algorithmes de répartitions de plus en plus efficaces. La création de ces
   algorithmes nécessite une connaissance approfondie du noyau: comment gère-t-il
