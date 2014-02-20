@@ -1,4 +1,4 @@
-\subsection{Étude du contexte}
+\chapter{Étude du contexte}
 
   \lettrine[nindent=0em,lines=3]{L}e but de ce projet sera dans un premier temps
   de mettre en place une infrastructure de compilation, de test et d'exécution
@@ -13,7 +13,7 @@
   pour le débugage.
   %% TODO: changer débugage par autre chose
 
-  \subsubsection{Infrastructure}
+  \section{Infrastructure}
     Dans cette partie, nous allons détailler l'infrastructure dont nous
     disposons et celle que nous avons mise en place pour ce projet. Notre avons
     à notre disposition une machine AMD Opteron 6172 composée de quatre
@@ -33,8 +33,8 @@
     %%   6:  16  22  16  22  16  22  10  16 
     %%   7:  22  16  22  16  16  22  16  10
 
-    \begin{figure}[H]
-      %% \includegraphics[scale=0.4]{img/numa_topology.png}
+    \begin{figure}[!h]
+      \centering
       \includegraphics[scale=0.4]{img/numa_arch_details.png}
       \caption{Topologie de la machine 6172}
       \label{f:numa_topology}
@@ -58,7 +58,7 @@
     avons installé une première VM, donc nous récupérerons la configuration du
     noyau pour la compilation.
 
-  \subsubsection{La gestion de la mémoire}
+  \section{La gestion de la mémoire}
   
     Une des mesures significatives lorsque l'on s'intéresse à la mémoire est le
     nombre de défaut de page, également appelé \og cache miss\fg ou \og CM\fg. Un
@@ -95,7 +95,8 @@
     soit en \og interleaving (I)\fg, et dans ce cas les données sont réparties
     équitablement entre les noeuds. Voici les résultats qu'ils ont obtenus:
 
-    \begin{figure}[H]
+    \begin{figure}[!h]
+      \centering
       \includegraphics[scale=0.65]{img/numa_memory_policy}
       \caption{Différences de performances en fonction de la politique de
         placement en mémoire sur une architecture NUMA (\textit{First-Touch ou Interleaving})}
@@ -108,7 +109,7 @@
     d'autres, et essayer d'identifier des \og familles d'applications\fg ayant
     comme trait commun leur comportement vis-à-vis de la mémoire.
     
-  \subsubsection{Communication entre threads}
+  \section{Communication entre threads}
     
     Un autre challenge quant à l'optimisation de performance sur architecture 
     NUMA sont les communications et les echanges de données qui peuvent s'effectuer entre 
@@ -119,7 +120,7 @@
     ne se feront (idéalement) que sur un seul et même noeud. Nous effectuerons donc
     une grande partie de ce monitoring sur les échanges menés par des tubes.
 
-  \subsubsection{But à terme}
+  \section{But à terme}
 
     Ce projet PSAR a pour but d'être ensuite intégré au sein d'un projet de plus grande 
     envergure, en effet, le but ici étant de fournir des informations et des outils
