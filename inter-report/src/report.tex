@@ -15,6 +15,7 @@
 \usepackage{hyperref}
 
 \usepackage{graphicx}
+\usepackage{listings}
 
 \usepackage{lettrine}
 \usepackage{paralist}
@@ -52,6 +53,13 @@
 \date{}
 
 %----------------------------------------------------------------------------------------
+%MACROS
+%----------------------------------------------------------------------------------------
+
+\newcommand{\ig}[1]{\begin{figure}[H]\begin{center}\includegraphics[scale=0.5]{#1.png}\end{center}\end{figure}}
+
+
+%----------------------------------------------------------------------------------------
 
 \begin{document}
   \maketitle
@@ -64,11 +72,9 @@
     \noindent \input{src/abstract}
   \end{abstract}
 
-  \begin{multicols}{2}
-    \input{src/intro}
-    \input{src/context}
-    \input{src/biblio}
-  \end{multicols}
+  \input{src/intro}
+  \input{src/context}
+  \input{src/biblio}
 
 
 
