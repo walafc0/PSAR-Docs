@@ -95,24 +95,68 @@
         besoin.
 
   \section{La gestion de la mémoire}
-  
-    Une des mesures significatives lorsque l'on s'intéresse à la mémoire est le
-    nombre de défaut de page, également appelé \og cache miss\fg ou \og CM\fg. Un
-    défaut de page se produit lorsqu'un processus demande à la mémoire une
-    ressource, mais que celle-ci ne s'y trouve pas. La mémoire envoie alors le signal
-    \og miss\fg au processeur, va charger la ressource et lui renvoi.
 
-    Le mapping de la mémoire est un problème en soit quelque soit le système
-    d'exploitation et l'architecture, mais il se révèle très complexe lorsque
-    l'on se retrouve avec une architecture NUMA. Où doit-on placer les objets en
-    mémoire ? Où plutot, dans quel noeud doit-on les placer ? Tout dépend du
-    noeud démandant le plus d'accès à ces objets. La question devient donc,
-    quels sont les processus qui demandent le plus d'accès mémoire et sur quels
-    noeuds sont-ils placés ? Si les accès sont distants, les noeuds sont-ils
-    très éloignés ? Engendrent-ils une congestion dans les interconnexions ? Si
-    oui, quel est le coût d'un déplacement de page mémoire ?  Toutes ces
-    questions et tous ces paramètres sont à prendre en compte lors des
-    (dé)placements en mémoire des données.
+    Sur une architecture NUMA, les performances des applications dépendent
+    fortement du placement mémoire. Ce placement est contrôlé par le système
+    d'exploitation via le mécanisme de pagination offert par le matériel. Le
+    mécanisme de pagination permet d'offrir une vue virtualisée de la
+    mémoire. Lorsque la pagination est activée, les instructions d'accès à la
+    mémoire manipulent des adresses mémoire dites virtuelles. La MMU (Memory
+    Management Unit) d'un coeur convertit alors l'adresse mémoire virtuelle en
+    adresse mémoire physique avant d'effectuer l'accès mémoire. Pour effectuer
+    cette conversion, la MMU utilise une table des pages dont l'adresse est
+    stockée dans un des registre du coeur. Cette table associe des plages
+    d'adresses virtuelles de taille fixe à des plages d'adresses physiques de
+    même taille. Dans le contexte de la pagination, cette plage d'adresse fixe
+    est appelée une page.
+
+    Le système d'exploitation maintient une table des pages par processus, donc
+    partagée par les threads du processus. Le système s'occupe de la remplir et
+    de la modifier en fonction des besoins du processus. Techniquement,
+    lorsqu'un processus alloue un espace mémoire à bas niveau (fonction mmap),
+    le système lui donne une autorisation d'accès à une plage d'adresse
+    virtuelle appelé XX\footnote{TODO} mais n'y associe pas encore de page
+    physique. Elles sont associées aux pages virtuelles de façon paresseuse : à
+    chaque fois que le processus accède à une page virtuelle qui n'est pas
+    encore présente dans la table des pages, le processeur déclenche une faute
+    des pages. Cette faute est rattrapée par une fonction du système qui
+    s'occupe alors de trouver une page physique libre pour l'associer à la page
+    virtuelle ayant déclanché la faute.
+  
+    Sur une architecture NUMA, l'espace d'adressage physique est lui-même
+    partitionné entre les noeuds NUMA. Les premières adresses physique sont
+    associées au premier noeud, les suivantes au second etc\ldots Lorsque le
+    système d'exploitation associe une page virtuelle à une page physique dans
+    une table des pages, il choisit donc sur quel noeud les accès à la page
+    virtuelle seront effectués en fonction de l'adresse de la page physique. Le
+    système peut aussi choisir de migrer une page virtuelle d'un noeud vers un
+    autre en copiant la page physique vers un autre noeud et en mettant à jour
+    la table des pages.
+
+    Pour effectuer un placement mémoire optimisant les performances des
+    processus, le système d'exploitation doit donc être capable de sélectionner
+    sur quel noeud placer les pages virtuelles. Ce choix dépend directement du
+    coeur sur lequel s'exécute le thread qui accède à la page, le but étant
+    d'essayer de placer le thread et les pages auxquelles il accède sur le même
+    noeud. La question devient donc, quels sont les threads qui demandent le
+    plus d’accès mémoire et sur quels noeuds sont-ils placés?
+    %% Une des mesures significatives lorsque l'on s'intéresse à la mémoire est
+    %% le nombre de défaut de page, également appelé \og cache miss\fg ou \og
+    %% CM\fg. Un défaut de page se produit lorsqu'un processus demande à la
+    %% mémoire une ressource, mais que celle-ci ne s'y trouve pas. La mémoire
+    %% envoie alors le signal \og miss\fg au processeur, va charger la ressource
+    %% et lui renvoi.  Le mapping de la mémoire est un problème en soit quelque
+    %% soit le système d'exploitation et l'architecture, mais il se révèle très
+    %% complexe lorsque l'on se retrouve avec une architecture NUMA. Où doit-on
+    %% placer les objets en mémoire ? Où plutot, dans quel noeud doit-on les
+    %% placer ? Tout dépend du noeud démandant le plus d'accès à ces objets. La
+    %% question devient donc, quels sont les processus qui demandent le plus
+    %% d'accès mémoire et sur quels noeuds sont-ils placés ?
+    Si les accès sont distants, les noeuds sont-ils très éloignés ?
+    Engendrent-ils une congestion dans les interconnexions ? Si oui, quel est le
+    coût d'un déplacement de page mémoire ? Toutes ces questions et tous ces
+    paramètres sont à prendre en compte lors des (dé)placements en mémoire des
+    données.
 
     Prenons l'exemple d'une application générant énormément d'accès mémoire. Le
     nombre de cache miss peut être très élevé si les données sont réparties
