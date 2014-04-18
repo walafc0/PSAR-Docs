@@ -1,0 +1,16 @@
+L’essor de l’informatique en nuage a permis aux administrations et entreprises
+de stocker d’énormes jeux de données. Aujourd’hui, l’un des goulots
+d’étranglement majeurs pour les performances de traitement de ces données est le
+système d’exploitation de chaque machine. Les systèmes actuels ne peuvent pas
+gérer efficacement les applications intensives en données car ils ne disposent
+pas d’une vue unifiée des ressources utilisées, ce qui les empêche de déterminer
+des stratégies efficaces pour le placement des tâches/données sur les ressources
+matérielles. Une meilleure gestion des ressources permettrait une forte
+réduction du nombre de machines nécessaires aux traitements des données.
+
+L’implémentation de sondes dans le noyau Linux permettrait d'identifier les
+ressources physiques et logicielles les plus sollicitées par les processus. Les
+informations remontées par ces sondes peuvent ensuite permettre de commencer à
+définir des stratégies de placement des tâches et des données prenant en compte
+à la fois la topologie de la machine et l’utilisation effectives des ressources
+par les tâches.

@@ -1,0 +1,92 @@
+%% \documentclass[twoside]{report}
+\documentclass[a4paper]{report}
+
+
+\usepackage[sc]{mathpazo}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[frenchb]{babel}
+\linespread{1.05}
+\usepackage{microtype}
+
+%% \usepackage[hmarginratio=1:1,top=32mm,columnsep=20pt]{geometry}
+%% \usepackage{multicol}
+\usepackage[hang, small,labelfont=bf,up,textfont=it,up]{caption}
+\usepackage[top=3cm, bottom=4cm, left=3cm, right=2.5cm]{geometry} 
+\usepackage{booktabs}
+\usepackage{float} 
+\usepackage{hyperref}
+
+\usepackage{graphicx}
+\usepackage{listings}
+
+\usepackage{lettrine}
+\usepackage{paralist}
+\usepackage{setspace}
+
+\usepackage{abstract}
+\renewcommand{\abstractnamefont}{\normalfont\bfseries}
+\renewcommand{\abstracttextfont}{\normalfont\small\itshape}
+
+\usepackage{titlesec}
+%% \renewcommand\thesection{\Roman{section}}
+%% \renewcommand\thesubsection{\Roman{subsection}}
+\titleformat{\chapter}[hang]{\bf\huge}{\thechapter}{2pc}{} 
+\titleformat{\section}[block]{\large}{\textbf\thesection.}{1em}{\textbf}
+\titleformat{\subsection}[block]{\large}{\thesubsection.}{1em}{}
+
+
+
+
+
+%----------------------------------------------------------------------------------------
+%% TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\title{\vspace{+0cm}\fontsize{24pt}{10pt}\selectfont\textbf{Monitoring du noyau Linux sur une architecture NUMA}}
+
+\author{
+\large
+\textsc{Kévin Gallardo, Eric Lombardet, Pierre-Yves Péneau}\\[2mm] 
+\normalsize Université Pierre et Marie Curie - Jussieu - Paris VI
+\vspace{-5mm}
+}
+\date{}
+
+%----------------------------------------------------------------------------------------
+%MACROS
+%----------------------------------------------------------------------------------------
+
+\newcommand{\ig}[1]{\begin{figure}[H]\begin{center}\includegraphics[scale=0.5]{#1.png}\end{center}\end{figure}}
+
+
+%----------------------------------------------------------------------------------------
+%% HEADER STYLE
+%----------------------------------------------------------------------------------------
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+% \fancyfoot{}
+\fancyhead[L]{Monitoring du noyau Linux sur une architecture NUMA}
+
+%----------------------------------------------------------------------------------------
+\begin{document}
+  \maketitle
+  \newpage
+
+  \tableofcontents
+  \newpage
+
+  \setcounter{page}{0}
+  \thispagestyle{empty}
+  \begin{abstract}
+    \centering
+    \noindent \input{src/abstract}
+  \end{abstract}
+  
+  \begin{onehalfspace}
+  \input{src/intro}
+  \input{src/context}
+  \input{src/biblio}
+  \end{onehalfspace}
+
+\end{document}
