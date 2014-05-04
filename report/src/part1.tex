@@ -1,11 +1,11 @@
-\chapter{Un titre de ouf \#TasVu}
+\chapter{Architecture des ordinateurs}
 
   \lettrine[nindent=0em,lines=3]{N} ous allons dans un premier temps revenir sur le fonctionnement des
   ordinateurs indépendement de l'architecture considérée. Ainsi, les différents
   concepts seront expliqués dans leur généralités avant d'exposer les
   spécificités de l'architecture NUMA. Cette partie nous permettra de faire un
   bilan général des connaissances acquises lors des modules d'architecture et de
-  noyau.
+  noyau lors de cette année.
 
 
   \section{Principes généraux}
@@ -34,14 +34,18 @@
       Chaque niveau de cache contient une partie des données de la mémoire
       RAM. La construction des caches se base sur deux grandes notions en
       architecture: la \textbf{localité spatiale} et la \textbf{localité
-        temporelle}. La localité spatiale est une loi nous disant que si une
-      donnée est accédée à une adresse A, il existe une très grande probabilité
-      que la prochaine donnée à vouloir être accédée par le proceseur soit à
-      l'adresse A+1. Cette loi utilise en effet la \textbf{séquentialité du
+        temporelle}. La localité spatiale est une loi disant que si une donnée
+      est accédée à une adresse A, il existe une très grande probabilité que la
+      prochaine donnée à vouloir être accédée par le proceseur soit à l'adresse
+      A+1. Cette loi se base sur le principe de la \textbf{séquentialité du
         stockage des données}. La localité temporelle nous dit quant à elle que
       si une donnée est accédée à un instant T, elle sera très probablement
-      accédée de nouveau dans un temps futur très proche.
-      
+      accédée de nouveau dans un temps futur très proche. Afin d'accélérer
+      encore plus le traitement des caches de premiers niveaux, le cache L1 est
+      coupé en deux parties: une contenant les identifiants d'instructions (les
+      branchement, chargements\ldots) à charger, et l'autre les données
+      relatives à ces instructions.
+
       Prenons une configuration simple avec un seul niveau de cache. Lorsque le
       processeur demande d'accéder à une donnée, il va maintenant le demander au
       cache et non directemment à la mémoire princiaple. Si le cache possède
@@ -50,7 +54,7 @@
       \textbf{Cache Miss}. Il va ensuite devoir accéder à la mémoire pour
       obtenir l'information demandée par le processeur et, en utilisant les lois
       de localité spatiale et temporelle évoquées précédemment, il va rapatrier
-      les X données suivant celle initialement demandée. Ainsi, pour les X
+      les $X$ données suivant celle initialement demandée. Ainsi, pour les $X$
       prochains accès, il est très probable que le processeur obtiendra
       directement du cache ce qu'il veut, et les performances auront été
       significativement améliorées.
@@ -58,87 +62,98 @@
       Ce fonctionnement est le même si l'on ajoute plusieurs niveaux de cache,
       comme sur la figure ~\ref{f:caches}
 
-      %% TODO: trouver une image simple avec trois niveaux de cache
-      \myfig{0.4}{img/caches.png}{Schéma des niveaux caches d'un processeur}{f:caches}
+      \myfig{0.37}{img/caches.png}{Schéma des niveaux caches d'un processeur}{f:caches}
 
       Le cache L3 est le plus gros, et il est généralement partagé en les
       processeurs. Les cache L1 est toujours local à un coeur. Les caches L2
       sont généralement locaux ou alors peuvent être partagés entre coeurs. Les
       caches de niveaux L3 sont eux généralement partagés entre les processeurs.
 
-      TODO: faut foutre ça quelque part\newline
-      Les accès et les communications entre les caches étant très rapides, les
-      performances seront encore plus améliorées.
-
     \subsection{La mémoire}
 
-    Nous avons précédement évoqué les accès mémoire sans rentrer dans les
-    détails. En effet, la gestion des adresses est un processus assez
-    complexe. Lorsque l'on parle de mémoire, il est important de différencier la
-    mémoire physique de la mémoire virtuelle. La mémoire physique est, comme son
-    nom l'indique, physiquement présente dans la machine. C'est que qu'on appelle
-    les \og barettes de RAM\fg. La mémoire virtuelle est une couche
-    d'abstraction de la mémoire physique, et c'est cette abstraction que le
-    système d'exploitation voit et manipule. Ainsi, à chaque instruction
-    nécessitant un accès, le processeur est obligé d'effectuer une traduction
-    d'adresse. Cette opération est effectuée par l'\textbf{Unité de Gestion
-      Mémoire}, ou \textbf{MMU} (Memory Management Unit). La MMU fait partie
-      intégrante du CPU, bien que sur certains modèles elle soit sur un circuit
-      séparé.\newline
+      Nous avons précédement évoqué les accès mémoire sans rentrer dans les
+      détails. En effet, la gestion des adresses est un processus assez
+      complexe. Lorsque l'on parle de mémoire, il est important de différencier
+      la mémoire physique de la mémoire virtuelle. La mémoire physique est,
+      comme son nom l'indique, physiquement présente dans la machine. C'est que
+      qu'on appelle les \og barettes de RAM\fg. La mémoire virtuelle est une
+      couche d'abstraction de la mémoire physique, et c'est cette abstraction
+      que le système d'exploitation voit et manipule. Ainsi, à chaque
+      instruction nécessitant un accès, le processeur est obligé d'effectuer une
+      traduction d'adresse. Cette opération est effectuée par l'\textbf{Unité de
+        Gestion Mémoire}, ou \textbf{MMU} (Memory Management Unit). La MMU fait
+      partie intégrante du CPU, bien que sur certains modèles elle soit sur un
+      circuit séparé.\newline
 
-    \myfig{0.5}{img/mmu2.png}{Schéma des communications entre le processeur et la MMU}{f:mmu2}
+      \myfig{0.5}{img/mmu2.png}{Schéma des communications entre le processeur et
+        la MMU}{f:mmu2}
 
-    La mémoire physique est découpé en partie logique appelées pages ou
-    segments, selon le type de découpage. De nos jours les mémoires sont à la
-    fois paginée et segmentée pour des raisons de performances. Un segment est
-    un espace mémoire de taille variable, alors qu'une page a une taille fixe
-    (généralement 4Ko). Toutes ces données sont stockées et gérées par le
-    système d'exploitation dans la \textbf{table des pages}. Sur les machines
-    x86-64, la table des pages est composée de quatre niveaux d'indirections
-    (figure ~\ref{f:tdp}). Chaque entrée dans les trois premiers niveaux redirige
-    vers le niveau suivant. L'entrée dans le dernier niveau est l'adresse de
-    l'espace dans la mémoire physique. Afin de réaliser cette traduction, les
-    adresses physiques sont coupées en cinq parties distinctes. Les quatres
-    premières indiquent les indexes dans les niveaux d'indirection. La dernière
-    partie contient l'offset de la donnée dans l'espace physique.
+      La mémoire physique est découpé en partie logique appelées pages ou
+      segments, selon le type de découpage. De nos jours les mémoires sont à la
+      fois paginée et segmentée pour des raisons de performances. Un segment est
+      un espace mémoire de taille variable, alors qu'une page a une taille fixe
+      (généralement 4Ko). Toutes ces données sont stockées et gérées par le
+      système d'exploitation dans la \textbf{table des pages}. Sur les machines
+      x86-64, la table des pages est composée de quatre niveaux d'indirections
+      (figure ~\ref{f:tdp}). Chaque entrée dans les trois premiers niveaux
+      redirige vers le niveau suivant. L'entrée dans le dernier niveau est
+      l'adresse de l'espace dans la mémoire physique. Afin de réaliser cette
+      traduction, les adresses physiques sont coupées en cinq parties
+      distinctes. Les quatres premières indiquent les indexes dans les niveaux
+      d'indirection. La dernière partie contient l'offset de la donnée dans
+      l'espace physique.
     
-    \myfig{0.25}{img/tdp.png}{TODO}{f:tdp}
+      \myfig{0.3}{img/tdp.png}{Découpage d'une adresse virtuelle en niveaux
+      d'indirection}{f:tdp}
 
-    Un des composant essentiel à la MMU est le \textbf{Translation lookaside
-      buffer} (TLB). Ce composant agit comme un cache pour les accès mémoire. Il
-    mémorise les derniers accès correspondant aux dernières pages auxquelles le
-    processeur a dû accéder, permettant d'améliorer grandement les temps d'accès
-    à la mémoire. La MMU, via le TLB connait donc toutes les équivalences entre
-    adresse virtuelles et physiques.
+      Un des composant essentiel à la MMU est le \textbf{Translation lookaside
+        buffer} (TLB). Ce composant agit comme un cache pour les accès
+      mémoire. Il mémorise les derniers accès correspondant aux dernières pages
+      auxquelles le processeur a dû accéder, permettant d'améliorer grandement
+      les temps d'accès à la mémoire. La MMU, via le TLB connait donc toutes les
+      équivalences entre adresse virtuelles et physiques.
 
 
-    Voici une illustration représentant les échanges entre les processeurs, les
-    différents niveaux de caches et la MMU et la mémoire RAM. Ici il n'y a que
-    deux niveaux de caches et le deuxième est partagé entre les processeurs.
+      Voici une illustration représentant les échanges entre les processeurs,
+      les différents niveaux de caches et la MMU et la mémoire RAM. Ici il n'y a
+      que deux niveaux de caches et le deuxième est partagé entre les
+      processeurs.
     
-    \myfig{0.6}{img/cache_mmu_global2.jpg}{TODO}{f:memory}
+      \myfig{0.65}{img/cache_mmu_global2.jpg}{Schéma des interactions concernant
+        les adresses et les données entre les différents composant d'un
+        ordinateur}{f:memory}
 
 
-  \subsection{Limites}
+    \subsection{Limites}
   
-    Ici on dit que c'est de la merde: mémoire unique -> bottleneck
+      Le type d'architecture présenté ici est utilisé partout dans nos machines
+      à l'heure actuelle. Le besoin de recourir à d'autres solutions se cantonne
+      uniquement à des utilisation particulière des ordinateurs. Prenons un
+      serveur réalisant une quantité de calcul énorme à la minute. Comment
+      réagira le contrôleur mémoire à toutes ces demandes d'accès simultannées ?
+      Si ce même serveur à maintenant besoin d'effectuer un grand nombre
+      d'entrées/sorties sur le disque dur, comment pouvoir garantir efficacité ?
+      C'est dans cette optique qu'on été pensée les architectures NUMA: pouvoir
+      répondre à ces problématiques particulières qui ne correspondent pas à
+      celle du grand public.
+
+\newpage
 
   \section{L'architecture NUMA}
-
-    \textit{NB: Dans cette partie nous détaillerons uniquement l'architecture de
-      la machine que nous avons eu à notre disposition durant ce projet. Les
+    
+    \textit{Dans cette partie nous détaillerons uniquement l'architecture de la
+      machine que nous avons eu à notre disposition durant ce projet. Les
       concepts sont les mêmes sur d'autres machines NUMA, seuls les
       caractéristiques technique ou les méthodes d'implémentation diffèrent. La
-      machine en question est un Opteron 6172 produit par le constructeur
-      américain
+      machine en question est appelé \og Magny Cour\fg et est produit par le
+      constructeur américain
       AMD.\footnote{http://products.amd.com/pages/optoeroncpudetail.aspx?id=644}\newline}
 
 
     L'architecture NUMA a été pensée dans le but d'accélérer la vitesse de
-    traitement de l'information par les machines. Cette amélioration est rendue
-    possible grâce à différents concepts que nous allons détailler dans cette
-    partie.
-
+    traitement de l'information par les machines ayant de gros besoin en
+    ressources. Cette amélioration est rendue possible grâce à différents
+    concepts que nous allons détailler dans par la suite.
 
   \subsection{Les noeuds}
 
@@ -146,9 +161,10 @@
     noeud\fg. Un noeud est un ensemble de coeurs de processeurs regroupés sur
     une même puce. Chaque noeud contient un certain nombre de coeurs d'un
     processeur sur une puce, et celles-ci sont assemblées par deux sur un
-    composant appelé \textit{Multichip Module}, ou MCM. Notre machine dipose de
+    composant appelé \textbf{Multichip Module}, ou MCM. Notre machine dipose de
     quatre processeurs AMD Opteron 6172 de douze coeurs chacun. On a donc quatre
-    MCM, contenant douze coeurs chacun, répartis en deux noeuds de six coeurs.
+    MCM, contenant douze coeurs chacun, répartis en deux noeuds de six
+    coeurs.\newline
 
     Les différents noeuds sont interconnectés entre eux via des bus appelés
     \textbf{liens Hypertransport} (HT links) et possèdent, selon les machines,
@@ -158,8 +174,7 @@
     Hypertransport, deux contrôleurs d'accès mémoire, et certain ont un
     contrôleur d'entrées/sorties,
 
-    \myfig{0.3}{img/mcm.png}{Illustration d'un MultiChip module pour une machine}{f:mcm}
-
+    \myfig{0.4}{img/mcm.png}{Illustration d'un MultiChip module}{f:mcm}
 
   \subsection{La communication entre les noeuds}
 
@@ -185,8 +200,7 @@
     du Magny Cour, on voit que les couples de noeuds \{P1,P6\} et \{P2-P5\} ne
     sont pas reliés sur notre machine.
 
-    \myfig{0.5}{img/topo.png}{Schéma de la topologie du \textit{Magny Cour}}{f:topo}
-    %% TODO: faut caler Magny Cour quelque part dans l'intro}
+    \myfig{0.6}{img/topo.png}{Schéma de la topologie du \textit{Magny Cour}}{f:topo}
 
     Les communciations sur les liens HT se font par
     paquets\cite{CacheHierarchy}. Ils sont uniformes et comprennent un header
@@ -202,14 +216,13 @@
     L'illustration ~\ref{f:topo} nous montre également une des particularité du
     Magny Cour: la disposition des contrôleurs d'entrée/sortie. Ces derniers ont
     été placés uniquement sur les noeuds P1 et P5. Cette disposition permet une
-    diminutation de la latence des échanges entre les noeuds (TODO:pourquoi ?),
-    mais peut être source de problème si les applications solicitant la machine
-    doivent faire beaucoup d'entrées/sorties. C'est notamment pour cela qu'il
-    est important de savoir quelles applications seront utilisées sur une
-    machine avant de procéder à l'achat.
-
-    %% TODO: lire (trouver ?) la doc sur les I/O et faire un petit paragraphe
-    %% dessus. Je sais pas trop quoi dire
+    diminutation de la latence des échanges entre les noeuds mais peut être
+    source de problème si les applications solicitant la machine doivent faire
+    beaucoup d'entrées/sorties. C'est notamment pour cela qu'il est important de
+    savoir quelles applications seront utilisées sur une machine avant de
+    procéder à l'achat. Dans la documentation du Magny Cour, il est dit que
+    cette machine a été étudiée pour du calcul haute performance et non pour des
+    entrées/sorties.
 
   \subsection{Les accès mémoire}
 
@@ -224,8 +237,8 @@
       distant}. Les accès distants sont possibles grâce au HT Links. Ces
     derniers sont chargés d'assurer la communication entre les noeuds, que ce
     soit pour les demandes d'accès aux données que pour la cohérence des
-    caches. Le coup d'un accès distant est environ 15\% plus \og cher\fg qu'un
-    accès local.
+    caches. Le coup d'un accès distant est environ 15\% plus cher qu'un accès
+    local.\cite{Lepers2014}
 
     TOFINISH
 
@@ -234,5 +247,8 @@
     Comme tout processeur, notre machine possède différents niveaux de cache:
     L1, L2 et L3. Les caches L1 et L2 sont locaux aux CPU, tandis que les caches
     L3 sont partagés. Leur taille est respectivement de 64Kb, 512K et 6Mb. Afin de 
+
     \subsubsection{La cohérence des caches}
+
+      
     

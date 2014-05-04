@@ -20,6 +20,9 @@
 \usepackage{graphicx}
 \usepackage{listings}
 
+%% Usefull for \FloatBarrier
+\usepackage{placeins}
+
 \usepackage{lettrine}
 \usepackage{paralist}
 \usepackage{setspace}
@@ -36,12 +39,14 @@
 %% \titleformat{\subsection}[block]{\large}{\thesubsection.}{1em}{}
 
 \newcommand{\myfig}[4] {
+  \FloatBarrier
   \begin{figure}[!h]
     \centering
     \includegraphics[scale=#1]{#2}
     \caption{#3}
     \label{#4}
   \end{figure}
+  \FloatBarrier
 }
 
 \setcounter{tocdepth}{3}
