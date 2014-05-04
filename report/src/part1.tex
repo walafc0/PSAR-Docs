@@ -113,7 +113,6 @@
       les temps d'accès à la mémoire. La MMU, via le TLB connait donc toutes les
       équivalences entre adresse virtuelles et physiques.
 
-
       Voici une illustration représentant les échanges entre les processeurs,
       les différents niveaux de caches et la MMU et la mémoire RAM. Ici il n'y a
       que deux niveaux de caches et le deuxième est partagé entre les
@@ -155,100 +154,197 @@
     ressources. Cette amélioration est rendue possible grâce à différents
     concepts que nous allons détailler dans par la suite.
 
-  \subsection{Les noeuds}
+    \subsection{Les noeuds}
 
-    L'intérêt et la puissance de cette architecture repose sur la notion de \og
-    noeud\fg. Un noeud est un ensemble de coeurs de processeurs regroupés sur
-    une même puce. Chaque noeud contient un certain nombre de coeurs d'un
-    processeur sur une puce, et celles-ci sont assemblées par deux sur un
-    composant appelé \textbf{Multichip Module}, ou MCM. Notre machine dipose de
-    quatre processeurs AMD Opteron 6172 de douze coeurs chacun. On a donc quatre
-    MCM, contenant douze coeurs chacun, répartis en deux noeuds de six
-    coeurs.\newline
+      L'intérêt et la puissance de cette architecture repose sur la notion de
+      \og noeud\fg. Un noeud est un ensemble de coeurs de processeurs regroupés
+      sur une même puce. Chaque noeud contient un certain nombre de coeurs d'un
+      processeur sur une puce, et celles-ci sont assemblées par deux sur un
+      composant appelé \textbf{Multichip Module}, ou MCM. Notre machine dipose
+      de quatre processeurs AMD Opteron 6172 de douze coeurs chacun. On a donc
+      quatre MCM, contenant douze coeurs chacun, répartis en deux noeuds de six
+      coeurs.\newline
 
-    Les différents noeuds sont interconnectés entre eux via des bus appelés
-    \textbf{liens Hypertransport} (HT links) et possèdent, selon les machines,
-    un certain nombre de contrôleurs mémoire et d'entrées/sorties. Nous
-    détaillerons par la suite les différentes caractéristique de ces
-    périphériques. Sur notre machine, chaque noeuds est composé de quatre liens
-    Hypertransport, deux contrôleurs d'accès mémoire, et certain ont un
-    contrôleur d'entrées/sorties,
+      Les différents noeuds sont interconnectés entre eux via des bus appelés
+      \textbf{liens Hypertransport} (HT links) et possèdent, selon les machines,
+      un certain nombre de contrôleurs mémoire et d'entrées/sorties. Nous
+      détaillerons par la suite les différentes caractéristique de ces
+      périphériques. Sur notre machine, chaque noeuds est composé de quatre
+      liens Hypertransport, deux contrôleurs d'accès mémoire, et certain ont un
+      contrôleur d'entrées/sorties,
 
-    \myfig{0.4}{img/mcm.png}{Illustration d'un MultiChip module}{f:mcm}
+      \myfig{0.4}{img/mcm.png}{Illustration d'un MultiChip module}{f:mcm}
 
-  \subsection{La communication entre les noeuds}
+    \subsection{La communication entre les noeuds}
 
-    La techonologie des liens Hypertransport permet l'interconnexion entre
-    processeurs. Développée depuis 2001, elle est principalement utilisée par
-    AMD dans ses machines NUMA mais également dans les systèmes
-    MIPS\footnote{Microprocessor without Interlocked Pipeline Stages} les plus
-    récents. Dans notre machine, il existe deux type de liens HT, la différence
-    étant leur capacité de transport:
+      La techonologie des liens Hypertransport permet l'interconnexion entre
+      processeurs. Développée depuis 2001, elle est principalement utilisée par
+      AMD dans ses machines NUMA mais également dans les systèmes
+      MIPS\footnote{Microprocessor without Interlocked Pipeline Stages} les plus
+      récents. Dans notre machine, il existe deux type de liens HT, la
+      différence étant leur capacité de transport:
 
-    \begin{itemize}
-      \item[HT3 x8:] bande passante maximale de 6.4GB/s. 2.8GB/s obervés sur notre
-      machine\cite{Lepers2014}
-      \item[HT3 x16:] bande passante maximale de 25.6GB/s.De 3GB/s à 6.6GB/s sur
-      notre machine\cite{Lepers2014}
-    \end{itemize}
+      \begin{itemize}
+        \item[HT3 x8:] bande passante maximale de 6.4GB/s. 2.8GB/s obervés sur
+          notre machine\cite{Lepers2014}
+        \item[HT3 x16:] bande passante maximale de 25.6GB/s.De 3GB/s à 6.6GB/s
+          sur notre machine\cite{Lepers2014}
+      \end{itemize}
 
-    Au sein d'un MCM, les noeuds sont reliés entre eux via un lien HT3 x8 et un
-    lien HT3 x16. Les noeuds entre MCM sont connectés entre eux de la même
-    manière. Néanmoins, tous les noeuds ne sont pas reliés entre eux, créant
-    ainsi une \textbf{toologie} particulière pour la machine considérée. Comme
-    le montre l'illustration ~\ref{f:topo} issue de la documentation officielle
-    du Magny Cour, on voit que les couples de noeuds \{P1,P6\} et \{P2-P5\} ne
-    sont pas reliés sur notre machine.
+      Au sein d'un MCM, les noeuds sont reliés entre eux via un lien HT3 x8 et
+      un lien HT3 x16. Les noeuds entre MCM sont connectés entre eux de la même
+      manière. Néanmoins, tous les noeuds ne sont pas reliés entre eux, créant
+      ainsi une \textbf{toologie} particulière pour la machine considérée. Comme
+      le montre l'illustration ~\ref{f:topo} issue de la documentation
+      officielle du Magny Cour, on voit que les couples de noeuds \{P1,P6\} et
+      \{P2-P5\} ne sont pas reliés sur notre machine.
 
-    \myfig{0.6}{img/topo.png}{Schéma de la topologie du \textit{Magny Cour}}{f:topo}
+      \myfig{0.6}{img/topo.png}{Schéma de la topologie du \textit{Magny
+          Cour}}{f:topo}
 
-    Les communciations sur les liens HT se font par
-    paquets\cite{CacheHierarchy}. Ils sont uniformes et comprennent un header
-    contenant l'émetteur et le récepteur de la requête. Pour chaque couple de
-    MCM, un noeud est défini comme étant le routeur. Si un noeud a besoin
-    d'accéder à une donnée dont il connait le propriétaire mais n'est pas
-    directement connecté à lui, alors il passera par le noeud routeur afin de
-    satisfaire sa demande.
+      Les communciations sur les liens HT se font par
+      paquets\cite{CacheHierarchy}. Ils sont uniformes et comprennent un header
+      contenant l'émetteur et le récepteur de la requête. Pour chaque couple de
+      MCM, un noeud est défini comme étant le routeur. Si un noeud a besoin
+      d'accéder à une donnée dont il connait le propriétaire mais n'est pas
+      directement connecté à lui, alors il passera par le noeud routeur afin de
+      satisfaire sa demande.
+
+    \subsection{Les contrôleurs d'entrées/sorties}
+
+      L'illustration ~\ref{f:topo} nous montre également une des particularité
+      du Magny Cour: la disposition des contrôleurs d'entrée/sortie. Ces
+      derniers ont été placés uniquement sur les noeuds P1 et P5. Cette
+      disposition permet une diminutation de la latence des échanges entre les
+      noeuds mais peut être source de problème si les applications solicitant la
+      machine doivent faire beaucoup d'entrées/sorties. C'est notamment pour
+      cela qu'il est important de savoir quelles applications seront utilisées
+      sur une machine avant de procéder à l'achat. Dans la documentation du
+      Magny Cour, il est dit que cette machine a été étudiée pour du calcul
+      haute performance et non pour des entrées/sorties.
+
+    \subsection{Les accès mémoire}
+
+      Dans notre configuration, chaque noeud possède deux contrôleurs mémoire,
+      et donc une partie de la mémoire physique. Le découpage est fait
+      équitablement de la façon suivante: le noeud numéro 1 possède la partie
+      basse de la mémoire, le noeud numéro 2 la partie suivante, et ainsi de
+      suite jusqu'a noeud numéro 8.
+
+      L'accès par un noeud à une donnée présente dans sa partie de la mémoire
+      est appelé \textbf{accès local}. Dans le cas contraire, c'est un
+      \textbf{accès distant}. Les accès distants sont possibles grâce au HT
+      Links. Ces derniers sont chargés d'assurer la communication entre les
+      noeuds, que ce soit pour les demandes d'accès aux données que pour la
+      cohérence des caches. Le coup d'un accès distant est environ 15\% plus
+      cher qu'un accès local.\cite{Lepers2014}
+
+    \subsection{Les caches}
+
+      Comme toute machine actuelle, le Magny Cour possède différents niveaux de
+      cache: L1, L2 et L3. Les caches L1 et L2 sont locaux aux CPU, tandis que
+      les caches L3 sont partagés. Leur taille est respectivement de 64Kb, 512Kb
+      et 6Mb. Le cache L2 est partagé entre les coeurs d'un MCM.
+
+      \subsubsection{La cohérence des caches}
+
+        Une des parties les plus complexes de la machine au niveau matériel est
+        le maintient d'une cohérence entre les caches.
+
+        TODO: le protocole MOESI. ça prend pas mal de bande passante des HT
+        Links. Mais ça marche du tonerre.
 
 
-  \subsection{Les contrôleurs d'entrées/sorties}
+  \section{Le système d'exploitation}
 
-    L'illustration ~\ref{f:topo} nous montre également une des particularité du
-    Magny Cour: la disposition des contrôleurs d'entrée/sortie. Ces derniers ont
-    été placés uniquement sur les noeuds P1 et P5. Cette disposition permet une
-    diminutation de la latence des échanges entre les noeuds mais peut être
-    source de problème si les applications solicitant la machine doivent faire
-    beaucoup d'entrées/sorties. C'est notamment pour cela qu'il est important de
-    savoir quelles applications seront utilisées sur une machine avant de
-    procéder à l'achat. Dans la documentation du Magny Cour, il est dit que
-    cette machine a été étudiée pour du calcul haute performance et non pour des
-    entrées/sorties.
+    C'est quoi en gros C'est quoi un thread noyau C'est quoi un module ?
+    Comment ça marche ? le kernel est pas monolithique du coup.  Brève
+    introduction mais on entre pas dans les détails, faut pas abuser non plus.
 
-  \subsection{Les accès mémoire}
+    \subsection{Rôle lors du placement mémoire}
 
-    Dans notre configuration, chaque noeud possède deux contrôleurs mémoire, et
-    donc une partie de la mémoire physique. Le découpage est fait équitablement
-    de la façon suivante: le noeud numéro 1 possède la partie basse de la
-    mémoire, le noeud numéro 2 la partie suivante, et ainsi de suite jusqu'a
-    noeud numéro 8.
+      Sur une architecture NUMA, les performances des applications dépendent
+      fortement du placement mémoire. Ce placement est contrôlé par le système
+      d'exploitation via le mécanisme de pagination offert par le matériel. Le
+      mécanisme de pagination permet d'offrir une vue virtualisée de la
+      mémoire. Lorsque la pagination est activée, les instructions d'accès à la
+      mémoire manipulent des adresses mémoire dites virtuelles. La MMU (Memory
+      Management Unit) d'un coeur convertit alors l'adresse mémoire virtuelle en
+      adresse mémoire physique avant d'effectuer l'accès mémoire. Pour effectuer
+      cette conversion, la MMU utilise une table des pages dont l'adresse est
+      stockée dans un des registre du coeur. Cette table associe des plages
+      d'adresses virtuelles de taille fixe à des plages d'adresses physiques de
+      même taille. Dans le contexte de la pagination, cette plage d'adresse fixe
+      est appelée une page.
 
-    L'accès par un noeud à une donnée présente dans sa partie de la mémoire est
-    appelé \textbf{accès local}. Dans le cas contraire, c'est un \textbf{accès
-      distant}. Les accès distants sont possibles grâce au HT Links. Ces
-    derniers sont chargés d'assurer la communication entre les noeuds, que ce
-    soit pour les demandes d'accès aux données que pour la cohérence des
-    caches. Le coup d'un accès distant est environ 15\% plus cher qu'un accès
-    local.\cite{Lepers2014}
-
-    TOFINISH
-
-  \subsection{Les caches}
-
-    Comme tout processeur, notre machine possède différents niveaux de cache:
-    L1, L2 et L3. Les caches L1 et L2 sont locaux aux CPU, tandis que les caches
-    L3 sont partagés. Leur taille est respectivement de 64Kb, 512K et 6Mb. Afin de 
-
-    \subsubsection{La cohérence des caches}
-
+      Le système d'exploitation maintient une table des pages par processus,
+      donc partagée par les threads du processus. Le système s'occupe de la
+      remplir et de la modifier en fonction des besoins du
+      processus. Techniquement, lorsqu'un processus alloue un espace mémoire à
+      bas niveau (fonction mmap), le système lui donne une autorisation d'accès
+      à une plage d'adresse virtuelle appelé XX\footnote{TODO} mais n'y associe
+      pas encore de page physique. Elles sont associées aux pages virtuelles de
+      façon paresseuse : à chaque fois que le processus accède à une page
+      virtuelle qui n'est pas encore présente dans la table des pages, le
+      processeur déclenche une faute des pages. Cette faute est rattrapée par
+      une fonction du système qui s'occupe alors de trouver une page physique
+      libre pour l'associer à la page virtuelle ayant déclanché la faute.
       
+      Sur une architecture NUMA, l'espace d'adressage physique est lui-même
+      partitionné entre les noeuds NUMA. Les premières adresses physique sont
+      associées au premier noeud, les suivantes au second etc\ldots Lorsque le
+      système d'exploitation associe une page virtuelle à une page physique dans
+      une table des pages, il choisit donc sur quel noeud les accès à la page
+      virtuelle seront effectués en fonction de l'adresse de la page
+      physique. Le système peut aussi choisir de migrer une page virtuelle d'un
+      noeud vers un autre en copiant la page physique vers un autre noeud et en
+      mettant à jour la table des pages.
+
+      Pour effectuer un placement mémoire optimisant les performances des
+      processus, le système d'exploitation doit donc être capable de
+      sélectionner sur quel noeud placer les pages virtuelles. Ce choix dépend
+      directement du coeur sur lequel s'exécute le thread qui accède à la page,
+      le but étant d'essayer de placer le thread et les pages auxquelles il
+      accède sur le même noeud. La question devient donc, quels sont les threads
+      qui demandent le plus d’accès mémoire et sur quels noeuds sont-ils placés?
+      Si les accès sont distants, les noeuds sont-ils très éloignés ?
+      Engendrent-ils une congestion dans les interconnexions ? Si oui, quel est
+      le coût d'un déplacement de page mémoire ? Toutes ces questions et tous
+      ces paramètres sont à prendre en compte lors des (dé)placements en mémoire
+      des données.
+
+      Prenons l'exemple d'une application générant énormément d'accès mémoire. Le
+      nombre de cache miss peut être très élevé si les données sont réparties
+      équitablement sur différents noeuds, ou au contraire placées sur un seul
+      noeud distant, avec un bus d'échange plus ou moins rapide avec le noeud
+      demandant les données. Et là encore, tout dépend de l'application utilisant
+      ces données. Certaines applications fonctionneront mieux si les données sont
+      réparties équitablement sur les noeuds, et au contraire certaine verront
+      leur performances largement dégradées.
+
+      Une expérience illustrant ce phénomène a été réalisée l'année
+      dernière\cite{Holistic2013}. L'équipe de recherche a \og stressé\fg une
+      machine NUMA avec différentes applications plus où moins gourmande en
+      ressource. La mémoire est soit gérée en \og First-Touch (F)\fg, c'est à dire
+      que les données sont placées dans le premier noeud entrainant un cache miss,
+      soit en \og interleaving (I)\fg, et dans ce cas les données sont réparties
+      équitablement entre les noeuds. Voici les résultats qu'ils ont obtenus:
+
+      \myfig{0.8}{img/numa_memory_policy}{Différences de performances en
+        fonction de la politique de placement en mémoire sur une architecture
+        NUMA (\textit{First-Touch ou Interleaving})}{f:memory_policy}
+      
+      On voit que les résultats sont largement différents selon les applications
+      et la politique de gestion. Ainsi, une de nos approches sera d'observer le
+      fonctionnement de la mémoire selon ces différentes applications, étudier
+      les défaut de pages, comprendre pourquoi certaines fonctionnent mieux que
+      d'autres, et essayer d'identifier des \og familles d'applications\fg ayant
+      comme trait commun leur comportement vis-à-vis de la mémoire.
+
+
+
     
+    
+
+
+  
