@@ -12,13 +12,16 @@
 %% \usepackage[hmarginratio=1:1,top=32mm,columnsep=20pt]{geometry}
 %% \usepackage{multicol}
 \usepackage[hang, small,labelfont=bf,up,textfont=it,up]{caption}
-\usepackage[top=3cm, bottom=4cm, left=3cm, right=2.5cm]{geometry} 
+\usepackage[top=4cm, bottom=4cm, left=4cm, right=4cm]{geometry} 
 \usepackage{booktabs}
 \usepackage{float} 
 \usepackage{hyperref}
 
 \usepackage{graphicx}
 \usepackage{listings}
+
+%% Usefull for \FloatBarrier
+\usepackage{placeins}
 
 \usepackage{lettrine}
 \usepackage{paralist}
@@ -32,12 +35,21 @@
 %% \renewcommand\thesection{\Roman{section}}
 %% \renewcommand\thesubsection{\Roman{subsection}}
 \titleformat{\chapter}[hang]{\bf\huge}{\thechapter}{2pc}{} 
-\titleformat{\section}[block]{\large}{\textbf\thesection.}{1em}{\textbf}
-\titleformat{\subsection}[block]{\large}{\thesubsection.}{1em}{}
+%% \titleformat{\section}[block]{\large}{\textbf\thesection.}{1em}{\textbf}
+%% \titleformat{\subsection}[block]{\large}{\thesubsection.}{1em}{}
 
+\newcommand{\myfig}[4] {
+  \FloatBarrier
+  \begin{figure}[!h]
+    \centering
+    \includegraphics[scale=#1]{#2}
+    \caption{#3}
+    \label{#4}
+  \end{figure}
+  \FloatBarrier
+}
 
-
-
+\setcounter{tocdepth}{3}
 
 %----------------------------------------------------------------------------------------
 %% TITLE SECTION
@@ -85,7 +97,8 @@
   
   \begin{onehalfspace}
   \input{src/intro}
-  \input{src/context}
+  \input{src/part1}
+  %% \input{src/context}
   \input{src/biblio}
   \end{onehalfspace}
 
