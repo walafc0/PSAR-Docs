@@ -38,17 +38,6 @@
 %% \titleformat{\section}[block]{\large}{\textbf\thesection.}{1em}{\textbf}
 %% \titleformat{\subsection}[block]{\large}{\thesubsection.}{1em}{}
 
-\newcommand{\myfig}[4] {
-  \FloatBarrier
-  \begin{figure}[!h]
-    \centering
-    \includegraphics[scale=#1]{#2}
-    \caption{#3}
-    \label{#4}
-  \end{figure}
-  \FloatBarrier
-}
-
 \setcounter{tocdepth}{3}
 
 %----------------------------------------------------------------------------------------
@@ -68,6 +57,17 @@
 %----------------------------------------------------------------------------------------
 %MACROS
 %----------------------------------------------------------------------------------------
+
+\newcommand{\myfig}[4] {
+  \FloatBarrier
+  \begin{figure}[!h]
+    \centering
+    \includegraphics[scale=#1]{#2}
+    \caption{#3}
+    \label{#4}
+  \end{figure}
+  \FloatBarrier
+}
 
 \newcommand{\ig}[1]{\begin{figure}[H]\begin{center}\includegraphics[scale=0.5]{#1.png}\end{center}\end{figure}}
 \newcommand{\benum}{\begin{enumerate}}
