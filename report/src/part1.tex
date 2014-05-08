@@ -1,11 +1,11 @@
 \chapter{Architecture des ordinateurs}
 
-  \lettrine[nindent=0em,lines=3]{N} ous allons dans un premier temps revenir sur le fonctionnement des
-  ordinateurs indépendement de l'architecture considérée. Ainsi, les différents
-  concepts seront expliqués dans leur généralités avant d'exposer les
-  spécificités de l'architecture NUMA. Cette partie nous permettra de faire un
-  bilan général des connaissances acquises lors des modules d'architecture et de
-  noyau lors de cette année.
+  \lettrine[nindent=0em,lines=3]{N} ous allons dans un premier temps revenir sur
+  le fonctionnement des ordinateurs indépendement de l'architecture
+  considérée. Ainsi, les différents concepts seront expliqués dans leur
+  généralités avant d'exposer les spécificités de l'architecture NUMA. Cette
+  partie nous permettra de faire un bilan général des connaissances acquises
+  lors des modules d'architecture et de noyau lors de cette année.
 
 
   \section{Principes généraux}
@@ -111,10 +111,10 @@
       mémoire. Il mémorise les derniers accès correspondant aux dernières pages
       auxquelles le processeur a dû accéder, permettant d'améliorer grandement
       les temps d'accès à la mémoire. La MMU, via le TLB connait donc toutes les
-      équivalences entre adresse virtuelles et physiques.
+      équivalences entre adresse virtuelles et physiques.\newline
 
       Voici une illustration représentant les échanges entre les processeurs,
-      les différents niveaux de caches et la MMU et la mémoire RAM. Ici il n'y a
+      les différents niveaux de caches, la MMU et la mémoire RAM. Ici il n'y a
       que deux niveaux de caches et le deuxième est partagé entre les
       processeurs.
     
@@ -131,10 +131,11 @@
       serveur réalisant une quantité de calcul énorme à la minute. Comment
       réagira le contrôleur mémoire à toutes ces demandes d'accès simultannées ?
       Si ce même serveur à maintenant besoin d'effectuer un grand nombre
-      d'entrées/sorties sur le disque dur, comment pouvoir garantir efficacité ?
-      C'est dans cette optique qu'on été pensée les architectures NUMA: pouvoir
-      répondre à ces problématiques particulières qui ne correspondent pas à
-      celle du grand public.
+      d'entrées/sorties sur le disque dur, comment pouvoir garantir l'efficacité
+      de cette opération sans nuire à celle des autres ?  C'est dans cette
+      optique qu'on été pensée les architectures NUMA: pouvoir répondre à ces
+      problématiques particulières qui ne correspondent pas à celle du grand
+      public.
 
 \newpage
 
@@ -144,7 +145,7 @@
       machine que nous avons eu à notre disposition durant ce projet. Les
       concepts sont les mêmes sur d'autres machines NUMA, seuls les
       caractéristiques technique ou les méthodes d'implémentation diffèrent. La
-      machine en question est appelé \og Magny Cour\fg et est produit par le
+      machine en question est le modèle \og Magny Cour\fg et est produit par le
       constructeur américain
       AMD.\footnote{http://products.amd.com/pages/optoeroncpudetail.aspx?id=644}\newline}
 
@@ -275,13 +276,40 @@
 
   \section{Le système d'exploitation}
 
-    
-    
-    C'est quoi en gros C'est quoi un thread noyau C'est quoi un module ?
-    Comment ça marche ? le kernel est pas monolithique du coup.  Brève
-    introduction mais on entre pas dans les détails, faut pas abuser non plus.
+    Dans le cadre de ce projet, nous avons avons accumuler de nouvelles
+    connaissances sur l'utilisation d'un système GNU/Linux. Nous avons ainsi
+    découvert la notion de \textbf{module noyau}, que nous allons expliciter
+    ici.
 
-    \subsection{Rôle lors du placement mémoire}
+    \subsection{Module noyau}
+
+      Un module est une partie du noyau que l'on peut facilement ajouter et/ou
+      retirer pendant l'exécution de la machine sans pour autant devoir la
+      redémarrer. C'est une avancée énorme sur le noyau Linux et BSD et cela
+      implique un changement profond dans la définition du noyau: il n'est plus
+      \og monolithique\fg mais microlithique. {\color{red}TODO: c'est vraiment
+        utile ça ?  Parce que va falloir expliquer ce qu'est un kernel
+        mono/micro-lithique.} Les modules peuvent être de types très variés. Il
+      peuvent assurer le fonctionnement des périphériques wifi, usb,
+      l'utilisation de machine virtuelles\ldots  \newline
+
+      L'ajout de module se fait via les commandes \textbf{insmod} et
+      \textbf{rmmod}. Il existe également un outil plus évolué appelé
+      \textbf{modprobe} qui réalise ces deux opérations. Ce dernier étant
+      beaucoup trop haut niveau pour notre projet, nous ne l'avons pas
+      utilisé.\newline
+
+      Cette fonctionnalité nous permet de développer notre application non plus
+      directement dans le noyau mais en utilisant un module, que nous
+      chargons/déchargons à notre guise. Ainsi, il n'est pas nécessaire de
+      recompiler un nouveau noyau et de le lancer sur une machine virtuelle à
+      chaque test. {\color{red}TODO: vérifier si c'est pas incohérent avec la
+        partie de Kevin.} En revanche, le fait de travailler directement sur le
+      noyau du Magny Cour implique que si nous le \og plantons\fg, il faudra
+      aller redémarrer la machine dans la salle où elle se situe, au lieu de
+      simplement redémarrer une machine virtuelle.
+
+    \subsection{Le placement mémoire}
 
       Sur une architecture NUMA, les performances des applications dépendent
       fortement du placement mémoire. Ce placement est contrôlé par le système
@@ -296,14 +324,15 @@
       une page virtuelle qui n'est pas encore présente dans la table des pages,
       le processeur déclenche une faute des pages. Cette faute est rattrapée par
       une fonction du système qui s'occupe alors de trouver une page physique
-      libre pour l'associer à la page virtuelle ayant déclanché la faute.
+      libre pour l'associer à la page virtuelle ayant déclanché la
+      faute.\newline
       
       Lorsque le système d'exploitation associe une page virtuelle à une page
       physique dans une table des pages, il choisit donc sur quel noeud les
       accès à la page virtuelle seront effectués en fonction de l'adresse de la
       page physique. Le système peut aussi choisir de migrer une page virtuelle
       d'un noeud vers un autre en copiant la page physique vers un autre noeud
-      et en mettant à jour la table des pages.
+      et en mettant à jour la table des pages.\newline
 
       Pour effectuer un placement mémoire optimisant les performances des
       processus, le système d'exploitation doit donc être capable de
@@ -318,37 +347,50 @@
       ces paramètres sont à prendre en compte lors des (dé)placements en mémoire
       des données.
 
-      Prenons l'exemple d'une application générant énormément d'accès mémoire. Le
-      nombre de cache miss peut être très élevé si les données sont réparties
-      équitablement sur différents noeuds, ou au contraire placées sur un seul
-      noeud distant, avec un bus d'échange plus ou moins rapide avec le noeud
-      demandant les données. Et là encore, tout dépend de l'application utilisant
-      ces données. Certaines applications fonctionneront mieux si les données sont
-      réparties équitablement sur les noeuds, et au contraire certaine verront
-      leur performances largement dégradées.
-
-      Une expérience illustrant ce phénomène a été réalisée l'année
-      dernière\cite{Holistic2013}. L'équipe de recherche a \og stressé\fg une
-      machine NUMA avec différentes applications plus où moins gourmande en
-      ressource. La mémoire est soit gérée en \og First-Touch (F)\fg, c'est à dire
-      que les données sont placées dans le premier noeud entrainant un cache miss,
-      soit en \og interleaving (I)\fg, et dans ce cas les données sont réparties
-      équitablement entre les noeuds. Voici les résultats qu'ils ont obtenus:
-
-      \myfig{0.8}{img/numa_memory_policy}{Différences de performances en
-        fonction de la politique de placement en mémoire sur une architecture
-        NUMA (\textit{First-Touch ou Interleaving})}{f:memory_policy}
+      \subsubsection{Stratégue de placement des données}
       
-      On voit que les résultats sont largement différents selon les applications
-      et la politique de gestion. Ainsi, une de nos approches sera d'observer le
-      fonctionnement de la mémoire selon ces différentes applications, étudier
-      les défaut de pages, comprendre pourquoi certaines fonctionnent mieux que
-      d'autres, et essayer d'identifier des \og familles d'applications\fg ayant
-      comme trait commun leur comportement vis-à-vis de la mémoire.
+        Il existe deux façons de répartir les données dans la mémoire. La
+        première est appelé \og First-Touch\fg et la seconde \og
+        Interleaving\fg. La technique du First-Touch est très simple: dès qu'un
+        signal Cache Miss est généré, la donnée demandée est placée dans le
+        cache ayant généré ce signal. Cette méthode a l'avatange d'être très
+        simple à mettre en oeuvre, mais elle entraine certain défauts que nous
+        allons voir par la suite. La méthode d'Interleaving consiste quant à
+        elle à séparer équitablement les données entre \og tous\fg les
+        noeuds. Cette technique est moins simple a implémenter mais elle a de
+        gros avantages selon l'utilisation de la machine. Ces deux stratégies ne
+        sont pas liées au matériel de la machine mais bien au système
+        d'exploitation et aux utilisateurs: ce sont eux qui décident quand et
+        quelle stratégie appliquer.\newline
 
+        Prenons l'exemple d'une application générant énormément d'accès
+        mémoire. Le nombre de cache miss peut être très élevé si les données
+        sont réparties équitablement sur différents noeuds, ou au contraire
+        placées sur un seul noeud distant, avec un bus d'échange plus ou moins
+        rapide avec le noeud demandant les données. Et là encore, tout dépend de
+        l'application utilisant ces données. Certaines applications
+        fonctionneront mieux si les données sont réparties équitablement sur les
+        noeuds, et au contraire certaine verront leur performances largement
+        dégradées.\newline
 
+        Une expérience illustrant ce phénomène a été réalisée l'année
+        dernière\cite{Holistic2013}. L'équipe de recherche a \og stressé\fg une
+        machine NUMA avec différentes applications plus où moins gourmande en
+        ressource. La mémoire est soit gérée en \og First-Touch (F)\fg, soit en
+        \og interleaving (I)\fg, et dans ce cas les données sont réparties
+        équitablement entre les noeuds. Voici les résultats qu'ils ont obtenus:
 
-    
+        \myfig{0.8}{img/numa_memory_policy}{Différences de performances en
+          fonction de la politique de placement en mémoire sur une architecture
+          NUMA (\textit{First-Touch ou Interleaving})}{f:memory_policy}
+      
+        On voit que les résultats sont largement différents selon les
+        applications et la politique de gestion. Ainsi, une de nos approches
+        sera d'observer le fonctionnement de la mémoire selon ces différentes
+        applications, étudier les défaut de pages, comprendre pourquoi certaines
+        fonctionnent mieux que d'autres, et essayer d'identifier des \og
+        familles d'applications\fg ayant comme trait commun leur comportement
+        vis-à-vis de la mémoire.    
     
 
 
