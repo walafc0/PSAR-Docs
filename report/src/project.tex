@@ -1,41 +1,182 @@
 \chapter{Mesures sur noyau Linux}
-\section{Introduction}
-Nous avons vu précédemment le fonctionnement des IBS. Dans cette partie, qui s'oriente plus vers l'aspect pratique du projet, nous allons expliquer la manière dont nous avons exploité les IBS. Comme les IBS peuvent renvoyer de très nombreuses informations, il nous faut réaliser une sélection des threads que nous allons analyser. Pour cela nous allons devoir mesurer leur activité et les trier de manière à sélectionner ceux qui nous intéressent le plus.
-\section{Définition de la chaleur d'un thread}
-Pour mesurer l'activité d'un thread nous avons décidé de lui associer un niveau de chaleur, un compteur qui lui est propre et que l'on va incrémenter ou décrémenter en fonction de son activité sur le système, plus il est actif et plus il devient chaud. Il est possible d'associer ce compteur de chaleur à différents événements en fonction des observations que l'on souhaite effectuer. On pourrait envisager de s'en servir pour classer des processus en fonction de leur utilisation de la mémoire, un processus utilisant beaucoup de mémoire serait intéressant à analyser avec IBS pour observer les stratégies de placement au niveaux des caches par rapport aux cœurs associés dans une architecture NUMA. Un autre objectif pourrait être d'analyser le nombre d'entrée/sortie d'un thread ce qui permettrait d'établir un algorithme au sein des nœuds de manière à rapprocher ces processus du contrôleur d'I/O du nœuds. Ou encore rechercher les threads communicant avec d'autres threads pour les rapprocher et améliorer leur temps de réponse.
-\subsection{Méthodes de tri envisagées et inconvénients}
-Pour exploiter cette ressource nous avions dans un premier temps envisagés d'utiliser des structures dédiées dans lesquels nous aurions stocké les informations utiles pour l'utilisation d'IBS. Cependant ces méthodes présentaient un certain nombre d'inconvénients.
-La première structure imaginée était un tableau dont chaque case contenait l'identifiant du processus et la valeur de sa chaleur. Cela permettait un tri simple du tableau en fonction de la chaleur, cependant les méthodes d'ajout de nouvelles cases dans un tableau borné ou de recherche des processus terminés selon des critères qui aurait été à déterminer n'était pas très optimales.
-Pour simplifier l'ajout d'éléments nous avons alors pensé à l'utilisation de liste chaînée, mais qui n'apportait malheureusement aucune solution pour l'identification et le nettoyage des processus terminés. L'utilisation de liste chaînée rendait même moins performant la méthode de tri car le nombre d'éléments n'étant pas borné il pouvait croître et contenir des processus inactifs, inintéressant pour l'analyse mais qui aurait consommé des ressources lors du tri.
-Dans la seconde structure nous avions remplacé le compteur par un tableau où chaque case représentait un niveau de chaleur. Nous remplissions ensuite notre tableau avec une liste chaînée des identifiants des threads. Le tableau était ensuite actualisé, au lieu d'incrémenter un compteur on déplaçait un maillon d'une liste vers une liste plus haute du tableau ( et donc plus chaud). Pour le décrémenter on effectuait un décalage des listes chaînées vers le bas du tableau (plus froid)
-Ce type d'implémentation est peu flexible et ne présente aucune possibilité pour connaître la valeur du compteur à partir de l'identifiant du thread. Elle pose aussi des incertitudes concernant la pérennité du compteur car ce type de structure est indépendante.
-\subsection{Solution utilisée}
-Les structures envisagées ne permettant pas de gérer efficacement notre compteur, nous avons décidé pour remédier à ces inconvénients et ne pas avoir à redéfinir une structure de processus juste pour un compteur de modifier directement la structure task\_struct du noyau pour y ajouter notre compteur de chaleur. De cette manière notre compteur est directement rattaché à son processus et ne peut être détruite ou modifiée par erreurs.
-\section{Tri des threads en fonction de leur chaleur}
-En abandonnant l'utilisation d'un tableau ou d'une liste pour stocker la chaleur d'un thread, nous devons trouver une méthode qui permettra de classer les processus en fonction de leur chaleur contenu dans la task\_struct.
-\subsection{Structure du système de tri}
-De manière à maîtriser la valeur du compteur nous lui avons fixé des bornes. Il devient alors possible de classer les threads dans un tableau ou chaque case sera associée à une chaleur et pointera vers une liste contenant tous les threads de même chaleur comme pour notre deuxième structure envisagées.
-La liste est simplement chaînée et se compose de structures contenant un pointeur vers la task\_struct représentée et un pointeur vers l'élément suivant. Nous avions envisagé d'ajouter un pointeur directement dans la task\_struct cependant cela obligeait à gérer la cohérence de la liste si la task\_struct est supprimée entre temps.
-L'implémentation de ce tableau de chaleurs consiste à parcourir la task\_struct et à tester si l'état du processus correspond aux éventements que nous voulons observer. Chaque processus commence avec une chaleur nulle et si son état correspond à notre événement on incrémente de manière fixe la valeur de sa chaleur, sinon on décrémente son niveau de chaleur, puis on place le thread dans la table de chaleur.
-Cette table de chaleur est généré à intervalle régulier de manière à classer l'ensemble des task\_struct. Cependant seul les éléments les plus actif nous intéressent, nous allons donc créer un autre tableau de taille correspondant au nombre de threads à monitorer dans lequel nous stockerons le pid et des informations nécessaires aux mesures avec IBS des threads identifiés comme les plus chaud dans notre table de chaleur. Une fois mis de coté il est possible de vider le tableau de liste pour la prochaine utilisation.
-\subsection{Evolution du compteur de chaleur}
-Une fois la structure mise en place il est nécessaire de s’intéresser à l'évolution du compteur qui déterminera le classement des threads.
-Dans notre cas nous avons décidé, comme critère de chaleur, de tester si l'état du processus correspond à
-« running », c'est à dire de tester si il est en cours d’exécution sur le processeur. Si c'est le cas on incrémente la valeur de notre compteur. Cela permet de définir comme chaud des processus ayant une forte occupation du cpu.
-Pour optimiser ce fonctionnement et affiner la liste des threads chauds dans notre classement il est possible de gérer dynamiquement la valeur dont le compteur va être décrémenté. En effet, si le système produit une grande quantité de threads très actif une gestion statique de notre compteur risque d'amasser peu à peu les processus sur la borne haute de notre table de chaleur chaleur. Nous aurions alors une grande quantité de threads chaud à un moment donné mais qui sur la durée ne se révéleraient pas forcément très utile pour une analyse plus poussée avec IBS qui fourniraient des données peu concluantes ou erronées.
-Or un thread qui nous intéresse n'est pas un thread avec une chaleur importante mais avec une chaleur plus importante que celle des autres threads. Il est donc intéressant de pouvoir contrôler et affiner à la volée la quantité de threads se trouvant parmi les éléments chaud de notre table. La décrémentation dynamique permet de remplir ce rôle en comptant par exemple le nombre de threads référencés dans la ligne la plus chaude de notre table. On peut choisir comme critère que l'on n'a pas besoin d'avoir plus du double en éléments que ce que l'on peut sauvegarder dans notre tableau de résultat et ensuite accélerer progressivement la vitesse de décrémentation ou au contraire lorsqu'il n'y en a plus assez pour remplir le tableau réduire la vitesse de décrémentation pour permettre au processus de revenir dans le haut de la table.
-Nous venons de voir la méthode que nous avons élaborer pour sélectionner les processus ayant une plus forte probabilité de fournir des résultats satisfaisant et ayant un intérêt pour ensuite être observé avec IBS. Dans la suite de ce rapport nous allons présenter le fonctionnement de notre programme, la manière dont les mesures sont lancés et les problèmes que nous avons rencontrés.
-\section{Réalisation des mesures}
-Nous avons à présent tous les éléments nécessaire à la création de notre programme. Dans cette partie nous allons présenter le fonctionnement de notre fonction principal chargé d'initialiser les mesures et de lancer les IBS.
-\subsection{Lancement des mesures : thread\_fn()}
-La fonction thread\_fn() est la fonction qui nous permet d'exploité la table de chaleur vu, d'initialiser
-les différents paramètres et de lancer les mesures.
-Cette fonction touchant à des éléments du noyau il est nécessaire de poser quelques sécurités comme par exemple l'activation des signaux, de définir le thread exécutant ce code comme interruptibles, et de fixer des timeouts. Cela permet en cas de problèmes de laisser le noyau se rétablir et tenter de continuer son fonctionnement normal.
-La seconde phase consiste à initialiser différentes méthodes comme les IBS.
-Seulement une fois le système initialiser il nous est possible de commencer les mesures.
-Comme nous l'avons précisé précédemment notre critère de chaleur se base sur l'occupation par un thread du processeur. Nous commençons donc par parcourir la table de tous les processus pour trouver ceux dont l'état est à running, s'ils le sont on incrémente leur chaleur, sinon elle décroit mais la chaleur ne peut pas être inférieur à 0.
-Nous effectuons ce parcours de table en boucle pendant un certain temps. Ce temps est défini par une variable que l'on incrémente à chaque parcours de la table et qui une fois une certaine valeur atteinte nous permet de sortir de la boucle. L’intérêt de cette boucle est de remplir la table de chaleur et de faire évoluer son contenu pendant que d'autre mesures comme les IBS peuvent être exécutées.
-L'étape suivante permet de préparer le lancement de nouvelles mesures IBS. Si des mesures étaient déjà en cours, on les arrête toutes et on purge notre table de chaleur pour lui faire accueillir les nouvelles valeurs de chaleurs obtenu lors du parcours précédent de la table des processus.
-Il faut à présent remplir notre table de chaleur pour cela nous allons parcourir toutes les task\_struct et remplir notre table en classant chaque processus à l'aide des valeurs de chaleurs que l'on trouve dans leur task\_struct. On enchaîne directement avec la recherche des threads les plus chaud dans notre table pour les sauvegarder immédiatement dans notre tableau dédié aux résultats en y indiquant le pid des threads chaud ainsi que le numéro du cpu à observer avec IBS pour obtenir nos résultats.
-Nous allons à présent parcourir ce tableau de résultat et lancer pour chaque thread les mesures IBS.
-La première exécution de la fonction principale est terminé, nous exécutons ce déroulement en boucle pour obtenir nos mesures
+
+  \section{Introduction}
+
+    Nous avons vu précédemment le fonctionnement des IBS. Dans cette partie, qui
+    s'oriente plus vers l'aspect pratique du projet, nous allons expliquer la
+    manière dont nous avons exploité les IBS. Comme les IBS peuvent renvoyer de
+    très nombreuses informations, il nous faut réaliser une sélection des
+    threads que nous allons analyser. Pour cela nous allons devoir mesurer leur
+    activité et les trier de manière à sélectionner ceux qui nous intéressent le
+    plus.
+
+  \section{Définition de la chaleur d'un thread}
+
+    Pour mesurer l'activité d'un thread nous avons décidé de lui associer un
+    niveau de chaleur, un compteur qui lui est propre et que l'on va incrémenter
+    ou décrémenter en fonction de son activité sur le système, plus il est actif
+    et plus il devient chaud. Il est possible d'associer ce compteur de chaleur
+    à différents événements en fonction des observations que l'on souhaite
+    effectuer. On pourrait envisager de s'en servir pour classer des processus
+    en fonction de leur utilisation de la mémoire, un processus utilisant
+    beaucoup de mémoire serait intéressant à analyser avec IBS pour observer les
+    stratégies de placement au niveaux des caches par rapport aux cœurs associés
+    dans une architecture NUMA. Un autre objectif pourrait être d'analyser le
+    nombre d'entrée/sortie d'un thread ce qui permettrait d'établir un
+    algorithme au sein des nœuds de manière à rapprocher ces processus du
+    contrôleur d'I/O du nœuds. Ou encore rechercher les threads communicant avec
+    d'autres threads pour les rapprocher et améliorer leur temps de réponse.
+
+    \subsection{Méthodes de tri envisagées et inconvénients}
+
+      Pour exploiter cette ressource nous avions dans un premier temps envisagés
+      d'utiliser des structures dédiées dans lesquels nous aurions stocké les
+      informations utiles pour l'utilisation d'IBS. Cependant ces méthodes
+      présentaient un certain nombre d'inconvénients.  La première structure
+      imaginée était un tableau dont chaque case contenait l'identifiant du
+      processus et la valeur de sa chaleur. Cela permettait un tri simple du
+      tableau en fonction de la chaleur, cependant les méthodes d'ajout de
+      nouvelles cases dans un tableau borné ou de recherche des processus
+      terminés selon des critères qui aurait été à déterminer n'était pas très
+      optimales.  Pour simplifier l'ajout d'éléments nous avons alors pensé à
+      l'utilisation de liste chaînée, mais qui n'apportait malheureusement
+      aucune solution pour l'identification et le nettoyage des processus
+      terminés. L'utilisation de liste chaînée rendait même moins performant la
+      méthode de tri car le nombre d'éléments n'étant pas borné il pouvait
+      croître et contenir des processus inactifs, inintéressant pour l'analyse
+      mais qui aurait consommé des ressources lors du tri.  Dans la seconde
+      structure nous avions remplacé le compteur par un tableau où chaque case
+      représentait un niveau de chaleur. Nous remplissions ensuite notre tableau
+      avec une liste chaînée des identifiants des threads. Le tableau était
+      ensuite actualisé, au lieu d'incrémenter un compteur on déplaçait un
+      maillon d'une liste vers une liste plus haute du tableau ( et donc plus
+      chaud). Pour le décrémenter on effectuait un décalage des listes chaînées
+      vers le bas du tableau (plus froid) Ce type d'implémentation est peu
+      flexible et ne présente aucune possibilité pour connaître la valeur du
+      compteur à partir de l'identifiant du thread. Elle pose aussi des
+      incertitudes concernant la pérennité du compteur car ce type de structure
+      est indépendante.
+
+    \subsection{Solution utilisée}
+
+      Les structures envisagées ne permettant pas de gérer efficacement notre
+      compteur, nous avons décidé pour remédier à ces inconvénients et ne pas
+      avoir à redéfinir une structure de processus juste pour un compteur de
+      modifier directement la structure task\_struct du noyau pour y ajouter
+      notre compteur de chaleur. De cette manière notre compteur est directement
+      rattaché à son processus et ne peut être détruite ou modifiée par erreurs.
+
+
+  \section{Tri des threads en fonction de leur chaleur}
+
+    En abandonnant l'utilisation d'un tableau ou d'une liste pour stocker la
+    chaleur d'un thread, nous devons trouver une méthode qui permettra de
+    classer les processus en fonction de leur chaleur contenu dans la
+    task\_struct.
+
+    \subsection{Structure du système de tri}
+
+      De manière à maîtriser la valeur du compteur nous lui avons fixé des
+      bornes. Il devient alors possible de classer les threads dans un tableau
+      ou chaque case sera associée à une chaleur et pointera vers une liste
+      contenant tous les threads de même chaleur comme pour notre deuxième
+      structure envisagées.  La liste est simplement chaînée et se compose de
+      structures contenant un pointeur vers la task\_struct représentée et un
+      pointeur vers l'élément suivant. Nous avions envisagé d'ajouter un
+      pointeur directement dans la task\_struct cependant cela obligeait à gérer
+      la cohérence de la liste si la task\_struct est supprimée entre temps.
+      L'implémentation de ce tableau de chaleurs consiste à parcourir la
+      task\_struct et à tester si l'état du processus correspond aux éventements
+      que nous voulons observer. Chaque processus commence avec une chaleur
+      nulle et si son état correspond à notre événement on incrémente de manière
+      fixe la valeur de sa chaleur, sinon on décrémente son niveau de chaleur,
+      puis on place le thread dans la table de chaleur.  Cette table de chaleur
+      est généré à intervalle régulier de manière à classer l'ensemble des
+      task\_struct. Cependant seul les éléments les plus actif nous intéressent,
+      nous allons donc créer un autre tableau de taille correspondant au nombre
+      de threads à monitorer dans lequel nous stockerons le pid et des
+      informations nécessaires aux mesures avec IBS des threads identifiés comme
+      les plus chaud dans notre table de chaleur. Une fois mis de coté il est
+      possible de vider le tableau de liste pour la prochaine utilisation.
+
+    \subsection{Evolution du compteur de chaleur}
+
+      Une fois la structure mise en place il est nécessaire de s’intéresser à
+      l'évolution du compteur qui déterminera le classement des threads.  Dans
+      notre cas nous avons décidé, comme critère de chaleur, de tester si l'état
+      du processus correspond à \og running\fg, c'est à dire de tester si il est
+      en cours d’exécution sur le processeur. Si c'est le cas on incrémente la
+      valeur de notre compteur. Cela permet de définir comme chaud des processus
+      ayant une forte occupation du cpu.  Pour optimiser ce fonctionnement et
+      affiner la liste des threads chauds dans notre classement il est possible
+      de gérer dynamiquement la valeur dont le compteur va être décrémenté. En
+      effet, si le système produit une grande quantité de threads très actif une
+      gestion statique de notre compteur risque d'amasser peu à peu les
+      processus sur la borne haute de notre table de chaleur chaleur. Nous
+      aurions alors une grande quantité de threads chaud à un moment donné mais
+      qui sur la durée ne se révéleraient pas forcément très utile pour une
+      analyse plus poussée avec IBS qui fourniraient des données peu concluantes
+      ou erronées.  Or un thread qui nous intéresse n'est pas un thread avec une
+      chaleur importante mais avec une chaleur plus importante que celle des
+      autres threads. Il est donc intéressant de pouvoir contrôler et affiner à
+      la volée la quantité de threads se trouvant parmi les éléments chaud de
+      notre table. La décrémentation dynamique permet de remplir ce rôle en
+      comptant par exemple le nombre de threads référencés dans la ligne la plus
+      chaude de notre table. On peut choisir comme critère que l'on n'a pas
+      besoin d'avoir plus du double en éléments que ce que l'on peut sauvegarder
+      dans notre tableau de résultat et ensuite accélerer progressivement la
+      vitesse de décrémentation ou au contraire lorsqu'il n'y en a plus assez
+      pour remplir le tableau réduire la vitesse de décrémentation pour
+      permettre au processus de revenir dans le haut de la table.  Nous venons
+      de voir la méthode que nous avons élaborer pour sélectionner les processus
+      ayant une plus forte probabilité de fournir des résultats satisfaisant et
+      ayant un intérêt pour ensuite être observé avec IBS. Dans la suite de ce
+      rapport nous allons présenter le fonctionnement de notre programme, la
+      manière dont les mesures sont lancés et les problèmes que nous avons
+      rencontrés.
+
+
+  \section{Réalisation des mesures}
+
+    Nous avons à présent tous les éléments nécessaire à la création de notre
+    programme. Dans cette partie nous allons présenter le fonctionnement de
+    notre fonction principal chargé d'initialiser les mesures et de lancer les
+    IBS.
+
+    \subsection{Lancement des mesures : thread\_fn()}
+
+      La fonction thread\_fn() est la fonction qui nous permet d'exploité la
+      table de chaleur vu, d'initialiser les différents paramètres et de lancer
+      les mesures.  Cette fonction touchant à des éléments du noyau il est
+      nécessaire de poser quelques sécurités comme par exemple l'activation des
+      signaux, de définir le thread exécutant ce code comme interruptibles, et
+      de fixer des timeouts. Cela permet en cas de problèmes de laisser le noyau
+      se rétablir et tenter de continuer son fonctionnement normal.  La seconde
+      phase consiste à initialiser différentes méthodes comme les IBS.
+      Seulement une fois le système initialiser il nous est possible de
+      commencer les mesures.  Comme nous l'avons précisé précédemment notre
+      critère de chaleur se base sur l'occupation par un thread du
+      processeur. Nous commençons donc par parcourir la table de tous les
+      processus pour trouver ceux dont l'état est à running, s'ils le sont on
+      incrémente leur chaleur, sinon elle décroit mais la chaleur ne peut pas
+      être inférieur à 0.  Nous effectuons ce parcours de table en boucle
+      pendant un certain temps. Ce temps est défini par une variable que l'on
+      incrémente à chaque parcours de la table et qui une fois une certaine
+      valeur atteinte nous permet de sortir de la boucle. L’intérêt de cette
+      boucle est de remplir la table de chaleur et de faire évoluer son contenu
+      pendant que d'autre mesures comme les IBS peuvent être exécutées.  L'étape
+      suivante permet de préparer le lancement de nouvelles mesures IBS. Si des
+      mesures étaient déjà en cours, on les arrête toutes et on purge notre
+      table de chaleur pour lui faire accueillir les nouvelles valeurs de
+      chaleurs obtenu lors du parcours précédent de la table des processus.  Il
+      faut à présent remplir notre table de chaleur pour cela nous allons
+      parcourir toutes les task\_struct et remplir notre table en classant
+      chaque processus à l'aide des valeurs de chaleurs que l'on trouve dans
+      leur task\_struct. On enchaîne directement avec la recherche des threads
+      les plus chaud dans notre table pour les sauvegarder immédiatement dans
+      notre tableau dédié aux résultats en y indiquant le pid des threads chaud
+      ainsi que le numéro du cpu à observer avec IBS pour obtenir nos résultats.
+      Nous allons à présent parcourir ce tableau de résultat et lancer pour
+      chaque thread les mesures IBS.  La première exécution de la fonction
+      principale est terminé, nous exécutons ce déroulement en boucle pour
+      obtenir nos mesures
