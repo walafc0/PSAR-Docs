@@ -4,6 +4,8 @@
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
 \usepackage{tikz}
+%% \usepackage{caption}
+
 
 %% Options section
 \usetheme{Boadilla} 
@@ -11,46 +13,39 @@
 \usecolortheme{dolphin}
 \useoutertheme{infolines}
 
-\title{Monitoring du noyau Linux sur une architecture NUMA}
-%% \subtitle{or\\ \textit{Is PopCornTime will destroyed the world ?}}
-\author[]{Kevin Gallardo\\Eric Lombardet\\Pierre-Yves Péneau}
+\title{Monitoring du noyau Linux}
+\subtitle{sur une architecture NUMA}
+%% \subtitle{Sous la direction de Gaël Thomas}
+\author[Gallardo - Lombardet - Peneau]{Kevin Gallardo\\Eric Lombardet\\Pierre-Yves Péneau}
 
 \newcommand{\bframe}{\begin{frame}{\secname}{\subsecname}}
 
-\date{\today} \institute[UPMC]{Pierre and Marie Curie College}
+\date{\oldstylenums{12 Mai 2014}} \institute[UPMC]{Université Pierre et Marie
+  Curie}
 
 \begin{document}
+
+  %% \captionsetup[figure]{labelformat=empty}
 
   \frame{\titlepage}
 
   \section{Introduction}
-    \subsection{}
-
-      \bframe
-
-        \begin{itemize}
-          \item Problématique:\newline \vspace{0.2cm}\hspace{0.4cm}
-            architectures NUMA, placement mémoire, performances\newline
-          \item<2> Objectif:\newline \vspace{0.2cm}{\hspace{0.4cm} évaluer
-            l'activité d'un thread, effectuer des mesures, récolter
-            des\\\hspace{0.55cm}informations}
+    \bframe
+      \begin{itemize}
+        \item Problématique:\newline \vspace{0.2cm}\hspace{0.4cm} architectures
+          NUMA, placement mémoire, performances\newline
+        \item<2> Objectif:\newline \vspace{0.2cm}\hspace{0.4cm} évaluation
+          d'activité, mesures d'évènement, étude comportementale
         \end{itemize}
-
-        %% \begin{block}<2-3>{Problem}
-        %%   plop
-        %% \end{block}
-        %% \begin{alertblock}<3>{Warning}
-        %%   ça plante l'amd lolz
-        %% \end{alertblock}
-      \end{frame}
+    \end{frame}
 
   \section{Infrastructure de tests}
     \bframe
       \begin{itemize}
-        \item utilisation mutualisée de Magny Cour $\rightarrow$ machines
+        \item utilisation mutualisée du Magny Cour $\rightarrow$ machines
           virtuelles
-        \item<2-3> problème: pas d'IBS avec qemu
-        \item<3> conséquence: travail en réel sur le noyau pour 50\% du projet
+        \item problème: pas d'IBS avec qemu
+        \item conséquence: travail en réel sur le noyau pour 50\% du projet
       \end{itemize}
     \end{frame}
 
@@ -58,27 +53,51 @@
     \subsection{Qu'est-ce que c'est ?}
       \bframe
         \begin{itemize}
-          \item 3 chocolats chauds batard
+          \item étude bas niveau du comportement matériel et système
+          \item très utile pour le débugage ou l'optimisation poussée
+          \item différentes solutions de monitoring existent
         \end{itemize}
       \end{frame}
 
     \subsection{Instructions Based Sampling}
       \bframe
         \begin{itemize}
-          \item technologie AMD 
-          \item<2-3> informations plus précises
-          \item<3> AYYY plus difficile à mettre en place
+          \item technologie AMD
+          \item informations plus précises car spécifique à une familles de
+            processeur
+          \item plus difficile à mettre en place
         \end{itemize}
       \end{frame}
 
-    \subsection{Mise en place t'as vu ouep}
       \bframe
         \begin{itemize}
-          \item appel de l'APIC
+          \item<1-2> beaucoup d'informations remontées par IBS
+          \item<1-2> sélection des plus utiles: cache hit/miss
+        \end{itemize}
+        \begin{figure}[h]
+          \centering
+          \includegraphics<2>[scale=0.25]{img/data3_color.png}
+        \end{figure}
+      \end{frame}
+
+    \subsection{Mise en place}
+      \bframe
+        \begin{itemize}
+          \item configuration de l'APIC
           \item utilisation des NMI
         \end{itemize}
       \end{frame}
 
 
-    
+  \section{Conclusion}
+    \bframe
+     20/20 ou chinois tuer et manger ta famille !
+     \begin{figure}[h]
+       \centering
+       \includegraphics[scale=0.4]{img/jackiechan.jpg}\newline
+       \textit{``Tu veux un bol de riz ?''}
+     \end{figure}
+
+    \end{frame}
+
 \end{document}
