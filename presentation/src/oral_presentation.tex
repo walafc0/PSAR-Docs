@@ -24,22 +24,61 @@
   \frame{\titlepage}
 
   \section{Introduction}
-    \subsection{Welcome to hell (or in France)}
+    \subsection{}
 
       \bframe
 
         \begin{itemize}
-          \item lol
-          \item lulz
-          \item mdr
+          \item Problématique:\newline \vspace{0.2cm}\hspace{0.4cm}
+            architectures NUMA, placement mémoire, performances\newline
+          \item<2> Objectif:\newline \vspace{0.2cm}{\hspace{0.4cm} évaluer
+            l'activité d'un thread, effectuer des mesures, récolter
+            des\\\hspace{0.55cm}informations}
         \end{itemize}
-        \begin{block}<2-3>{Problem}
-          plop
-        \end{block}
-        \begin{alertblock}<3>{Warning}
-          ça plante l'amd lolz
-        \end{alertblock}
 
+        %% \begin{block}<2-3>{Problem}
+        %%   plop
+        %% \end{block}
+        %% \begin{alertblock}<3>{Warning}
+        %%   ça plante l'amd lolz
+        %% \end{alertblock}
       \end{frame}
 
+  \section{Infrastructure de tests}
+    \bframe
+      \begin{itemize}
+        \item utilisation mutualisée de Magny Cour $\rightarrow$ machines
+          virtuelles
+        \item<2-3> problème: pas d'IBS avec qemu
+        \item<3> conséquence: travail en réel sur le noyau pour 50\% du projet
+      \end{itemize}
+    \end{frame}
+
+  \section{Monitoring}
+    \subsection{Qu'est-ce que c'est ?}
+      \bframe
+        \begin{itemize}
+          \item 3 chocolats chauds batard
+        \end{itemize}
+      \end{frame}
+
+    \subsection{Instructions Based Sampling}
+      \bframe
+        \begin{itemize}
+          \item technologie AMD 
+          \item<2-3> informations plus précises
+          \item<3> AYYY plus difficile à mettre en place
+        \end{itemize}
+      \end{frame}
+
+    \subsection{Mise en place t'as vu ouep}
+      \bframe
+        \begin{itemize}
+          \item appel de l'APIC
+          \item utilisation des NMI
+        \end{itemize}
+      \end{frame}
+
+
+    
 \end{document}
