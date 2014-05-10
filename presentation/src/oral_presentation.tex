@@ -115,7 +115,7 @@
           \item technologie AMD
           \item informations plus précises car spécifique à une famille de
             processeur
-          \item problème:w
+          \item problème:
             \begin{itemize}
               \item plus difficile à mettre en place
             \end{itemize} 
@@ -247,14 +247,14 @@
         Algorithme:
         \begin{itemize}
           \item[1] stopper IBS
-          \item[2] vider le tableau de chaleur
-          \item[3] parcour la task\_struct
+          \item[2] vider le tableau de chaleurs
+          \item[3] parcourir la task\_struct
           \begin{itemize}
             \item[a] si RUNNING $\rightarrow$ incrémentation du compteur de chaleur
             \item[b] sinon décrémentation
           \end{itemize}
-          \item[4] générer le tableau de chaleur
-          \item[5] lancer les mesures sur ls threads chauds
+          \item[4] générer le tableau de chaleurs
+          \item[5] lancer les mesures sur les threads chauds
         \end{itemize}
       \end{frame}
 
@@ -263,26 +263,43 @@
           \begin{itemize}
             \item Utilisation d'un facteur d'incrémentation et de décrémentation
               dynamique
-          \end{itemize}a
+          \end{itemize}
         \end{block}
         \visible<2-> {
           \begin{alertblock}{Problèmes}
             \begin{itemize}
-            \item pas d'IBS avec qemu
+            \item pas d'IBS avec qemu $\rightarrow$ merge impossible sur Magny Cour
             \end{itemize}
           \end{alertblock}
         }
       \end{frame}
 
   \section{Conclusion}
-    \bframe
-     20/20 ou chinois tuer et manger ta famille !
-     \begin{figure}[h]
-       \centering
-       \includegraphics[scale=0.4]{img/jackiechan.jpg}\newline
-       \textit{``Tu veux un bol de riz ?''}
-     \end{figure}
+    \subsection{}
+      \bframe
+        \begin{block}{Apports personnels}
+          \begin{itemize}
+            \item beaucoup de connaissances acquises
+            \item utile pour l'année prochaine
+            \item découverte d'une nouvelle architecture prometteuse
+          \end{itemize}
+        \end{block}
+        \begin{block}{Ce qu'il reste à faire}<2>
+          \begin{itemize}
+            \item merger les deux parties du projet sur Magny Cour
+            \item mettre en place un traitement des données
+            \item améliorer l'algorithme de tri d'activités
+          \end{itemize}
+        \end{block}
+      \end{frame}
 
-    \end{frame}
+      %% \bframe
+      %%   20/20 ou chinois tuer et manger ta famille !
+      %%   \begin{figure}[h]
+      %%     \centering
+      %%     \includegraphics[scale=0.4]{img/jackiechan.jpg}\newline
+      %%     \textit{``Tu veux un bol de riz ?''}
+      %%   \end{figure}
+      %% \end{frame}
 
 \end{document}
