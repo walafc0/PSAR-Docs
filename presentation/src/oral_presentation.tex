@@ -45,8 +45,15 @@
         \item utilisation mutualisée du Magny Cour $\rightarrow$ machines
           virtuelles
         \item problème: pas d'IBS avec qemu
-        \item conséquence: travail en réel sur le noyau pour 50\% du projet
+
       \end{itemize}
+      
+      \visible<2-> {
+        \begin{alertblock}{Conséquence}
+          travail en réel sur le noyau pour 50\% du projet
+        \end{alertblock}
+      }
+
     \end{frame}
 
   \section{Monitoring}
@@ -59,33 +66,71 @@
         \end{itemize}
       \end{frame}
 
-    \subsection{Instructions Based Sampling}
+    \subsection{Instruction Based Sampling - Présentation}
       \bframe
         \begin{itemize}
           \item technologie AMD
-          \item informations plus précises car spécifique à une familles de
+          \item informations plus précises car spécifique à une famille de
             processeur
-          \item plus difficile à mettre en place
+          \item problème:w
+            \begin{itemize}
+              \item plus difficile à mettre en place
+            \end{itemize} 
         \end{itemize}
       \end{frame}
 
+    \subsection{Instruction Based Sampling - Fonctionnement}
+      \bframe
+        \begin{itemize}
+          \item tag aléatoirement une instruction
+          \item suivi de l'exécution
+          \item deux types de mesures: fetch/execution sampling
+        \end{itemize}
+      \end{frame}
+
+    \subsection{Instruction Based Sampling - Utilisation}
       \bframe
         \begin{itemize}
           \item<1-2> beaucoup d'informations remontées par IBS
           \item<1-2> sélection des plus utiles: cache hit/miss
         \end{itemize}
-        \begin{figure}[h]
-          \centering
-          \includegraphics<2>[scale=0.25]{img/data3_color.png}
-        \end{figure}
+
+        \visible<2->{
+          \begin{figure}[h]
+            \centering
+            \includegraphics[scale=0.22]{img/data3_color.png}
+            \caption{Schéma du registre MSR IbsOpData3}
+          \end{figure}
+        }
       \end{frame}
+
+    \subsection{Instruction Based Sampling - Défauts}
+     \bframe
+       \begin{itemize}
+         \item overhead: traitement coûteux des mesures
+         \item pas de vision d'ensemble
+       \end{itemize}
+     \end{frame}
 
     \subsection{Mise en place}
       \bframe
         \begin{itemize}
           \item configuration de l'APIC
-          \item utilisation des NMI
+          \begin{itemize}
+            \item informer l'APIC de la présence d'interruptions IBS
+            \item à faire pour chaque coeur
+          \end{itemize}
+          \item enregistrement d'un handler NMI
+          \begin{itemize}
+            \item appelé à chaque interruption IBS
+            \item récolte les informations dans les registres MSR
+          \end{itemize}
         \end{itemize}
+        \visible<2->{
+          \begin{alertblock}{Attention}
+            le handler doit être enregistré une et une seule fois au niveau du système
+          \end{alertblock}
+        }
       \end{frame}
 
 

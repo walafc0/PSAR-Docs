@@ -2,3 +2,5 @@ bin/*.toc
 bin/*.aux
 bin/*.log
 bin/*.out
+bin/*.nav
+bin/*.snm
