@@ -1,1 +1,4 @@
-bin/
+bin/*.toc
+bin/*.aux
+bin/*.log
+bin/*.out

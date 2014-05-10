@@ -89,7 +89,9 @@
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 % \fancyfoot{}
-\fancyhead[L]{Monitoring du noyau Linux sur une architecture NUMA}
+\renewcommand{\chaptermark}[1]{\uppercase{\markboth{#1}{}}}
+\fancyhead[L]{Monitoring du noyau Linux}
+\fancyhead[R]{\thechapter . \leftmark}
 
 %----------------------------------------------------------------------------------------
 \begin{document}
