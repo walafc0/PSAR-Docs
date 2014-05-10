@@ -45,15 +45,131 @@
 %% TITLE SECTION
 %----------------------------------------------------------------------------------------
 
-\title{\vspace{+0cm}\fontsize{24pt}{10pt}\selectfont\textbf{Monitoring du noyau Linux sur une architecture NUMA}}
+%% \title{\vspace{+0cm}\fontsize{24pt}{10pt}\selectfont\textbf{Monitoring du noyau Linux sur une architecture NUMA}}
 
-\author{
-\large
-\textsc{Kévin Gallardo, Eric Lombardet, Pierre-Yves Péneau}\\[2mm] 
-\normalsize Université Pierre et Marie Curie - Jussieu - Paris VI
-\vspace{-5mm}
+%% \author{
+%% \large
+%% \textsc{Kévin Gallardo, Eric Lombardet, Pierre-Yves Péneau}\\[2mm] 
+%% \normalsize Université Pierre et Marie Curie - Jussieu - Paris VI
+%% \vspace{-5mm}
+%% }
+%% \date{}
+
+%%%%%%%%%%%%%%%%%%%%%%% PAGE DE GARDE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\makeatletter
+\def\clap#1{\hbox to 0pt{\hss #1\hss}}%
+\def\ligne#1
+{%
+	\hbox to \hsize{%
+	\vbox{\centering #1}}
+}%
+
+\def\haut#1#2#3
+{%
+	\hbox to \hsize{%
+	\rlap{\vtop{\raggedright #1}}%
+	\hss
+	\clap{\vtop{\centering #2}}%
+	\hss
+	\llap{\vtop{\raggedleft #3}}}
+}%
+\def\bas#1#2#3
+{%
+	\hbox to \hsize{%
+	\rlap{\vbox{\raggedright #1}}%
+	\hss
+	\clap{\vbox{\centering #2}}%
+	\hss
+	\llap{\vbox{\raggedleft #3}}}
+}%
+\def\logo#1#2#3
+{%
+	\hbox to \hsize{%
+	\rlap{\vbox{\raggedright #1}}%
+	\hss
+	\clap{\vbox{\centering #2}}%
+	\hss
+	\llap{\vbox{\raggedleft #3}}}
+}%
+\def\maketitle
+{%
+	\thispagestyle{empty}\vbox to \vsize
+	{%
+		\begin{tabular}{lcr}
+			\hbox
+		    {
+		    	\mbox{%
+				    \hspace{1pt}%
+				    \includegraphics[scale=0.3]{img/univ.jpg}%}
+				    \hspace{30pt}
+		    	}
+		    }%
+		    &
+		    \hspace{3cm}
+		    &
+		    \raggedright
+		    \hbox
+		    {
+		    	\mbox{%
+				    \hspace{20pt}%
+				    \includegraphics[scale=0.3]{img/lip6.jpg}%
+				    \hspace{4pt}
+		    	}
+		    }%
+		\end{tabular}
+
+	    \vspace{3cm}
+		\haut{}{\@blurb}{}
+
+		\vfill
+		%\vspace{1cm}
+		\begin{flushleft}
+		\huge \@title
+		\end{flushleft}
+		\par
+		\hrule height 2pt
+		\par
+		\begin{flushright}
+		\Large \@author
+		\par
+		\end{flushright}
+		%\vspace{1cm}
+		\vfill
+		    \hbox
+		    {
+		    	\mbox{%
+					    \hspace{4pt}%
+						\logo{}{
+					   		%\includegraphics[scale=0.6]{Images/synergie.jpg}%
+					   	}{}
+					    \hspace{4pt}
+		    	}
+		    }%
+		\vfill
+		\bas{}{\@location, le \@date}{}
+	}%
+	\cleardoublepage
 }
-\date{}
+\def\date#1{\def\@date{#1}}
+\def\author#1{\def\@author{#1}}
+\def\title#1{\def\@title{#1}}
+\def\location#1{\def\@location{#1}}
+\def\blurb#1{\def\@blurb{#1}}
+\date{\today}
+\author{}
+\location{Paris}\blurb{}
+\makeatother
+\title{{\sl\LARGE\textbf{Monitoring du noyau Linux sur une architecture NUMA}}\normalsize}
+\author{Kevin GALLARDO\\Eric LOMBARDET\\Pierre-Yves PÉNEAU}
+\location{Paris}
+\blurb{%
+Université Paris 6 - Jussieu\\
+Master Informatique - Spécialité S.A.R.\\
+\vspace{0.7cm}
+\textbf{Rapport de projet}\\[2em]
+Enseignant référent : Gaël Thomas
+}
+%%%%%%%%%%%%%%%%%%%%%%% FIN PAGE DE GARDE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %----------------------------------------------------------------------------------------
 %MACROS
@@ -96,12 +212,39 @@
 %----------------------------------------------------------------------------------------
 \begin{document}
   \maketitle
+  \thispagestyle{empty}
+  \newpage
+  \strut
   \newpage
 
+  %% \tableofcontents
+  %% \thispagestyle{plain}   % Supprime l'en-tête si la TDM fait 2 pages
+  %% \newpage
+
+  %% \renewcommand{\contentsname}{Sommaire}  % Renomme la TDM
+  %% \thispagestyle{empty}
+  %% \tableofcontents        % Construction de la TDM
+  %% \thispagestyle{plain}   % Supprime l'en-tête si la TDM fait 2 pages
+
+
+
+
+  \thispagestyle{empty}
+  \begin{onehalfspace}
+    \input{src/thanks}
+  \end{onehalfspace}
+
+  \thispagestyle{empty}
+  \newpage
+  \strut
+  \thispagestyle{empty}
+  \newpage
+
+  \renewcommand{\thepage}{}
   \tableofcontents
-  \newpage
+  \renewcommand\thepage{\arabic{page}}
 
-  \setcounter{page}{0}
+  \setcounter{page}{0}  
   \thispagestyle{empty}
   \begin{abstract}
     \centering
@@ -115,6 +258,7 @@
   \input{src/monitoring}
   \input{src/project}
   \input{src/biblio}
+  \listoffigures
   \end{onehalfspace}
 
 \end{document}
