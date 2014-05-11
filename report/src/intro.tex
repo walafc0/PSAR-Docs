@@ -1,5 +1,8 @@
-\chapter{Introduction}
-  \section{Problématique}
+\pagestyle{plain}
+\addcontentsline{toc}{chapter}{Introduction}
+
+\chapter*{Introduction}
+  \section*{Problématique}
     \lettrine[nindent=0em,lines=3]{L} es systèmes multicoeurs modernes sont
     maintenant basés sur l'architecture NUMA (Non Uniforme Memory Access). Avec
     un système NUMA, les coeurs des processeurs sont regroupés en noeuds. Chaque
@@ -32,12 +35,13 @@
     renseignements sur ces différents points (et de nombreux autres) que l'on
     pourra être en mesure d'affiner les solutions de répartition de charge.
 
-    \section{Objectif}
-      L'objectif de ce projet a donc été de construire en temps réel une base
-      d'informations détaillées contenant les actions des threads les plus
-      actifs du système. Cela pour ensuite permettre l'optimisation des accès
-      mémoire de manière personnalisée pour chaque thread. La réalisation de cet
-      objectif consistait en 3 phases : 
+  \section*{Objectif}
+  
+    L'objectif de ce projet a donc été de construire en temps réel une base
+    d'informations détaillées contenant les actions des threads les plus actifs
+    du système. Cela pour ensuite permettre l'optimisation des accès mémoire de
+    manière personnalisée pour chaque thread. La réalisation de cet objectif
+    consistait en 3 phases :
 
       \bitem
         \item{Etudier et comparer differentes techniques de l'analyse
@@ -53,12 +57,12 @@
           informations dans des structures de données adaptées.}
       \eitem
 
-  \section{Déroulement}
+  \section*{Déroulement}
     Ce projet nous a permis d'avoir accès à la machine Magny Cour (présentée en
     section 2)) située au Laboratoire Informatique de Paris 6, celle-ci
     possédant les caractéristiques adéquates au bon fonctionnement des
     technologies utilisées (présentées en section 3)) pour ce projet.
-  
+
     \paragraph{Phase de démarrage difficile}
       Magny Cour étant utilisée en collaboration avec d'autres chercheurs du
       laboratoire, il n'était pas envisageable de developper et tester notre
@@ -112,8 +116,7 @@
         actifs, cela a nécéssité d'adapter le code des deux parties et
         d'effectuer quelques mesures.
 
-
-  \section{Répartition des taches}
+  \section*{Répartition des taches}
     La première partie de compréhension et de mise en place de l'infrastructure
     s'est faite en commun. Ensuite nous nous sommes réparti les taches de la
     manière suivante :
@@ -124,4 +127,3 @@
       \item{1 personne pour le classement des threads les plus chauds en temps
         réel : Eric}
     \eitem
-	

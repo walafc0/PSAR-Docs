@@ -1,35 +1,39 @@
   \section{Introduction}
     \bframe
-      \begin{itemize}
-        \item problématique:\newline \vspace{0.2cm}\hspace{0.4cm} architectures
-          NUMA, placement mémoire, performances\newline
-        \item<2> objectifs:\newline \vspace{0.2cm}\hspace{0.4cm} évaluation
-          d'activité, mesures d'évènements, étude comportementale
+      \begin{block}<1-2>{Problématique}
+        \begin{itemize}
+          \item architecture NUMA
+          \item placement mémoire
+          \item performances
         \end{itemize}
+      \end{block}
+      \begin{block}{Objectifs}
+        \begin{itemize}
+          \item<2> évaluation d'activité
+          \item<2> mesures d'évènements
+          \item<2> étude comportementale
+        \end{itemize}
+      \end{block}
     \end{frame}
 
   \section{Architecture NUMA}
     \subsection{Présentation}
 
       \bframe
-        \visible<1-> {
-          \begin{block}{Objectifs}
-            \begin{itemize}
-              \item accélerer les temps de traitement
-              \item répondre aux besoins d'applications spécifiques
-            \end{itemize}
-          \end{block}
-        }
-        \visible<2-> {
-          \begin{block}{Moyens mis en \oe uvre}
-            \begin{itemize}
-              \item découpe en noeuds
-              \item placement des contrôleurs d'E/S
-              \item liens d'interconnexions
-              \item mise en place d'une topologie
-            \end{itemize}
-          \end{block}
-        }
+        \begin{block}<1-2>{Objectifs}
+          \begin{itemize}
+            \item accélerer les temps de traitement
+            \item répondre aux besoins d'applications spécifiques
+          \end{itemize}
+        \end{block}
+        \begin{block}{Moyens mis en \oe uvre}
+          \begin{itemize}
+            \item<2> découpe en noeuds
+            \item<2> placement des contrôleurs d'E/S
+            \item<2> liens d'interconnexions
+            \item<2> mise en place d'une topologie
+          \end{itemize}
+        \end{block}
       \end{frame}
 
     \subsection{Vue d'ensemble}
