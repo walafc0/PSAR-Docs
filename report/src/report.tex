@@ -217,18 +217,6 @@ Enseignant référent : Gaël Thomas
   \strut
   \newpage
 
-  %% \tableofcontents
-  %% \thispagestyle{plain}   % Supprime l'en-tête si la TDM fait 2 pages
-  %% \newpage
-
-  %% \renewcommand{\contentsname}{Sommaire}  % Renomme la TDM
-  %% \thispagestyle{empty}
-  %% \tableofcontents        % Construction de la TDM
-  %% \thispagestyle{plain}   % Supprime l'en-tête si la TDM fait 2 pages
-
-
-
-
   \thispagestyle{empty}
   \begin{onehalfspace}
     \input{src/thanks}
@@ -252,13 +240,15 @@ Enseignant référent : Gaël Thomas
   \end{abstract}
   
   \begin{onehalfspace}
-  \input{src/intro}
-  \input{src/part1}
-  %% \input{src/context}
-  \input{src/monitoring}
-  \input{src/project}
-  \input{src/biblio}
-  \listoffigures
+
+    \input{src/intro}
+    \thispagestyle{plain}
+    \input{src/part1}
+    \input{src/monitoring}
+    \input{src/project}
+    \input{src/conclu}
+    \input{src/biblio}
+    \listoffigures
   \end{onehalfspace}
 
 \end{document}
