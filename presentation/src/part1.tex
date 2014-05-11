@@ -7,11 +7,11 @@
           \item performances
         \end{itemize}
       \end{block}
-      \begin{block}{Objectifs}
+      \begin{block}<2>{Objectifs}
         \begin{itemize}
-          \item<2> évaluation d'activité
-          \item<2> mesures d'évènements
-          \item<2> étude comportementale
+          \item évaluation d'activité
+          \item mesures d'évènements
+          \item étude comportementale
         \end{itemize}
       \end{block}
     \end{frame}
@@ -26,12 +26,12 @@
             \item répondre aux besoins d'applications spécifiques
           \end{itemize}
         \end{block}
-        \begin{block}{Moyens mis en \oe uvre}
+        \begin{block}<2>{Moyens mis en \oe uvre}
           \begin{itemize}
-            \item<2> découpe en noeuds
-            \item<2> placement des contrôleurs d'E/S
-            \item<2> liens d'interconnexions
-            \item<2> mise en place d'une topologie
+            \item découpe en noeuds
+            \item placement des contrôleurs d'E/S
+            \item liens d'interconnexions
+            \item mise en place d'une topologie
           \end{itemize}
         \end{block}
       \end{frame}
@@ -54,17 +54,19 @@
   \section{Infrastructure de tests}
     \subsection{}
       \bframe
-        \begin{itemize}
-          \item utilisation mutualisée du Magny Cour $\rightarrow$ machines
-            virtuelles
-          \item problème: pas d'IBS avec qemu
-        \end{itemize}
-      
-        \visible<2-> {
-          \begin{alertblock}{Conséquence}
-            Travail en réel sur le noyau pour 50\% du projet
-          \end{alertblock}
-        }
+        \begin{block}<1-2>{Un titre}
+          \begin{itemize}
+            \item utilisation mutualisée du Magny Cour $\rightarrow$ machines
+              virtuelles
+            \item compilation du noyau avec KGDB
+            \item problème: aucune émulation du monitoring par Qemu
+          \end{itemize}
+        \end{block}
+        \begin{alertblock}<2>{Conséquence}
+          \begin{itemize}
+            \item Travail en réel sur le noyau pour 50\% du projet
+          \end{itemize}
+        \end{alertblock}
       \end{frame}
 
 
