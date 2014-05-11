@@ -212,19 +212,19 @@
 
       \bframe
           Utilisation d'un tableau de chaleur
-          \myfig{0.9}{img/screen1.png}
+          \myfig{0.25}{img/screen1.png}
       \end{frame}
       \bframe
           Utilisation d'un tableau de chaleur
-          \myfig{0.9}{img/screen2.png}
+          \myfig{0.25}{img/screen2.png}
       \end{frame}
       \bframe
           Utilisation d'un tableau de chaleur
-          \myfig{0.9}{img/screen3.png}
+          \myfig{0.25}{img/screen3.png}
       \end{frame}
       \bframe
           Utilisation d'un tableau de chaleur
-          \myfig{0.9}{img/screen4.png}
+          \myfig{0.25}{img/screen4.png}
       \end{frame}
 
     \subsection{Solution retenue}
@@ -246,12 +246,12 @@
       \bframe
         Algorithme:
         \begin{itemize}
-          \item[1] stopper IBS
-          \item[2] vider le tableau de chaleurs
-          \item[3] parcourir la task\_struct
+          \item[1] parcourir la task\_struct
           \begin{itemize}
             \item[a] si RUNNING $\rightarrow$ incrémentation du compteur de chaleur
             \item[b] sinon décrémentation
+          \item[2] stopper IBS
+          \item[3] vider le tableau de chaleurs
           \end{itemize}
           \item[4] générer le tableau de chaleurs
           \item[5] lancer les mesures sur les threads chauds
