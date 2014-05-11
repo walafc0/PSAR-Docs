@@ -187,9 +187,21 @@
       chaque thread les mesures IBS.  La première exécution de la fonction
       principale est terminé, nous exécutons ce déroulement en boucle pour
       obtenir nos mesures
-	\section{Mesures}
-		Voici ci-dessous un exemple des mesures récoltées dans la fonction de traitement d'une interruption IBS. Les valeurs sont affichées par des printk, ce sont des entiers sur 32 bits c'est à dire qu'elles ne donnent pas directement les informations concernant les bits activés dans les registres de données. Pour les obtenir il faut simplement convertir en binaire les entiers du résultat et voir quels sont les bits activés lors de la mesure.
-		\begin{verbatim}
+
+
+  \section{Mesures}
+    
+    Voici ci-dessous un exemple des mesures récoltées dans la fonction de
+    traitement d'une interruption IBS. Les valeurs sont des valeurs entières de
+    32 bits affichées par des printk. Ces nombres ne donnent pas directement les
+    informations concernant les bits activés dans les registres de données. Pour
+    les obtenir, il faut simplement appliquer des masques binaires sur les
+    résultats selon les bits que l'on désire observer. Les chaines de caractères
+    figurant avant les nombres sont les noms des registres MSR contenant les
+    informations. Le deux registres principaux étant \textbf{IbsOpData1} et
+    \textbf{IbsOpData3}.
+
+    \begin{verbatim}
 
 amd48-systeme kernel: [ 2579.394384] MSR_AMD64_IBSOPDATA2 0 0
 amd48-systeme kernel: [ 2579.394391] MSR_AMD64_IBSOPRIP -2130035521 -1
@@ -238,4 +250,5 @@ amd48-systeme kernel: [ 2579.434566] MSR_AMD64_IBSOPDATA3 278528 0
 amd48-systeme kernel: [ 2579.434567] MSR_AMD64_IBSOPCLINAD 0 0
 amd48-systeme kernel: [ 2579.434569] MSR_AMD64_IBSDCPHYSAD 268483584 0
 amd48-systeme kernel: [ 2579.434570] MSR_AMD64_IBSOPCTL 925695 0
-		\end{verbatim}
+
+    \end{verbatim}
