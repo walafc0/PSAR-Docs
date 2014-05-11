@@ -1,0 +1,127 @@
+  \section{Mesures sur le noyau Linux}
+    \subsection{Chaleur d'un thread}
+      \bframe
+        \begin{itemize}
+          \item un compteur représente l'activité d'un thread
+          \item différents critères d'activité:
+            \begin{itemize}
+              \item état: (in)actif
+              \item taux d'utilisation mémoire
+              \item nombre d'entrées/sorties
+              \item commnunications entre threads
+              \item \ldots
+            \end{itemize}
+        \end{itemize}
+      \end{frame}
+
+    \subsection{Méthodes de tri envisagées}
+      \bframe
+        \begin{itemize}
+          \item nécessité d'une structure dédiée
+          \item utilisation d'un tableau ou d'une liste chainée
+          \begin{itemize}
+            \item insertion de nouveaux threads
+            \item difficulté à trouver les threads morts
+            \item tri peu performant
+          \end{itemize}
+        \end{itemize}
+        \visible<2-> {
+          \begin{alertblock}{Conclusion}
+            Solution abandonnée
+          \end{alertblock}
+        }
+      \end{frame}
+
+      \bframe
+          Utilisation d'un tableau de chaleur
+          \myfig{0.25}{img/screen1.png}
+      \end{frame}
+      \bframe
+          Utilisation d'un tableau de chaleur
+          \myfig{0.25}{img/screen2.png}
+      \end{frame}
+      \bframe
+          Utilisation d'un tableau de chaleur
+          \myfig{0.25}{img/screen3.png}
+      \end{frame}
+      \bframe
+          Utilisation d'un tableau de chaleur
+          \myfig{0.25}{img/screen4.png}
+      \end{frame}
+
+    \subsection{Solution retenue}
+      \bframe
+        \begin{itemize}
+          \item ajout du compteur dans la task\_struct
+          \item on conserve le tableau de chaleur précédent
+          \item structure Gestion pour les listes
+        \end{itemize}
+        \myfig{0.3}{img/screen5.png}
+      \end{frame}
+
+      \bframe
+        \myfig{0.33}{img/screen6.png}
+      \end{frame}
+
+    \subsection{Réalisation}
+
+      \bframe
+        Algorithme:
+        \begin{itemize}
+          \item[1] parcourir la task\_struct
+          \begin{itemize}
+            \item[a] si RUNNING $\rightarrow$ incrémentation du compteur de chaleur
+            \item[b] sinon décrémentation
+          \item[2] stopper IBS
+          \item[3] vider le tableau de chaleurs
+          \end{itemize}
+          \item[4] générer le tableau de chaleurs
+          \item[5] lancer les mesures sur les threads chauds
+        \end{itemize}
+      \end{frame}
+
+      \bframe
+        \begin{block}{Optimisation}
+          \begin{itemize}
+            \item Utilisation d'un facteur d'incrémentation et de décrémentation
+              dynamique
+          \end{itemize}
+        \end{block}
+        \visible<2-> {
+          \begin{alertblock}{Problèmes}
+            \begin{itemize}
+            \item pas d'IBS avec qemu $\rightarrow$ merge impossible sur Magny Cour
+            \end{itemize}
+          \end{alertblock}
+        }
+      \end{frame}
+
+  \section{Conclusion}
+    \subsection{}
+      \bframe
+        \begin{block}{Apports personnels}
+          \begin{itemize}
+            \item beaucoup de connaissances acquises
+            \item utile pour l'année prochaine
+            \item découverte d'une nouvelle architecture prometteuse
+          \end{itemize}
+        \end{block}
+        \begin{block}{Ce qu'il reste à faire}<2>
+          \begin{itemize}
+            \item merger les deux parties du projet sur Magny Cour
+            \item mettre en place un traitement des données
+            \item améliorer l'algorithme de tri d'activités
+          \end{itemize}
+        \end{block}
+      \end{frame}
+
+      %% \bframe
+      %%   20/20 ou chinois tuer et manger ta famille !
+      %%   \begin{figure}[h]
+      %%     \centering
+      %%     \includegraphics[scale=0.4]{img/jackiechan.jpg}\newline
+      %%     \textit{``Tu veux un bol de riz ?''}
+      %%   \end{figure}
+      %% \end{frame}
+
+
