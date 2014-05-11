@@ -187,3 +187,55 @@
       chaque thread les mesures IBS.  La première exécution de la fonction
       principale est terminé, nous exécutons ce déroulement en boucle pour
       obtenir nos mesures
+	\section{Mesures}
+		Voici ci-dessous un exemple des mesures récoltées dans la fonction de traitement d'une interruption IBS. Les valeurs sont affichées par des printk, ce sont des entiers sur 32 bits c'est à dire qu'elles ne donnent pas directement les informations concernant les bits activés dans les registres de données. Pour les obtenir il faut simplement convertir en binaire les entiers du résultat et voir quels sont les bits activés lors de la mesure.
+		\begin{verbatim}
+
+amd48-systeme kernel: [ 2579.394384] MSR_AMD64_IBSOPDATA2 0 0
+amd48-systeme kernel: [ 2579.394391] MSR_AMD64_IBSOPRIP -2130035521 -1
+amd48-systeme kernel: [ 2579.394393] MSR_AMD64_IBSOPDATA 1179659 0
+amd48-systeme kernel: [ 2579.394395] MSR_AMD64_IBSOPDATA3 0 0
+amd48-systeme kernel: [ 2579.394396] MSR_AMD64_IBSOPCLINAD 0 0
+amd48-systeme kernel: [ 2579.394397] MSR_AMD64_IBSDCPHYSAD 0 0
+amd48-systeme kernel: [ 2579.394399] MSR_AMD64_IBSOPCTL 925695 0
+
+amd48-systeme kernel: [ 2579.424173] MSR_AMD64_IBSOPDATA2 0 0
+amd48-systeme kernel: [ 2579.424180] MSR_AMD64_IBSOPRIP -2130432956 -1
+amd48-systeme kernel: [ 2579.424182] MSR_AMD64_IBSOPDATA 655364 0
+amd48-systeme kernel: [ 2579.424183] MSR_AMD64_IBSOPDATA3 394273 0
+amd48-systeme kernel: [ 2579.424185] MSR_AMD64_IBSOPCLINAD 1073729000 -30719
+amd48-systeme kernel: [ 2579.424187] MSR_AMD64_IBSDCPHYSAD 1073729000 1
+amd48-systeme kernel: [ 2579.424188] MSR_AMD64_IBSOPCTL 925695 0
+
+amd48-systeme kernel: [ 2579.424277] MSR_AMD64_IBSOPDATA2 0 0
+amd48-systeme kernel: [ 2579.424279] MSR_AMD64_IBSOPRIP -2130593607 -1
+amd48-systeme kernel: [ 2579.424281] MSR_AMD64_IBSOPDATA 1441814 0
+amd48-systeme kernel: [ 2579.424282] MSR_AMD64_IBSOPDATA3 0 0
+amd48-systeme kernel: [ 2579.424283] MSR_AMD64_IBSOPCLINAD 0 0
+amd48-systeme kernel: [ 2579.424284] MSR_AMD64_IBSDCPHYSAD 0 0
+amd48-systeme kernel: [ 2579.424286] MSR_AMD64_IBSOPCTL 925695 0
+
+amd48-systeme kernel: [ 2579.424345] MSR_AMD64_IBSOPDATA2 0 0
+amd48-systeme kernel: [ 2579.424347] MSR_AMD64_IBSOPRIP -2127328833 -1
+amd48-systeme kernel: [ 2579.424348] MSR_AMD64_IBSOPDATA 1179664 0
+amd48-systeme kernel: [ 2579.424350] MSR_AMD64_IBSOPDATA3 0 0
+amd48-systeme kernel: [ 2579.424351] MSR_AMD64_IBSOPCLINAD 0 0
+amd48-systeme kernel: [ 2579.424352] MSR_AMD64_IBSDCPHYSAD 0 0
+amd48-systeme kernel: [ 2579.424353] MSR_AMD64_IBSOPCTL 925695 0
+
+amd48-systeme kernel: [ 2579.434233] MSR_AMD64_IBSOPDATA2 0 0
+amd48-systeme kernel: [ 2579.434238] MSR_AMD64_IBSOPRIP -2130111010 -1
+amd48-systeme kernel: [ 2579.434239] MSR_AMD64_IBSOPDATA 1114125 0
+amd48-systeme kernel: [ 2579.434241] MSR_AMD64_IBSOPDATA3 393250 0
+amd48-systeme kernel: [ 2579.434242] MSR_AMD64_IBSOPCLINAD 936245760 -30717
+amd48-systeme kernel: [ 2579.434244] MSR_AMD64_IBSDCPHYSAD 936245760 3
+amd48-systeme kernel: [ 2579.434245] MSR_AMD64_IBSOPCTL 925695 0
+
+amd48-systeme kernel: [ 2579.434557] MSR_AMD64_IBSOPDATA2 0 0
+amd48-systeme kernel: [ 2579.434562] MSR_AMD64_IBSOPRIP -2130435850 -1
+amd48-systeme kernel: [ 2579.434565] MSR_AMD64_IBSOPDATA 16842754 0
+amd48-systeme kernel: [ 2579.434566] MSR_AMD64_IBSOPDATA3 278528 0
+amd48-systeme kernel: [ 2579.434567] MSR_AMD64_IBSOPCLINAD 0 0
+amd48-systeme kernel: [ 2579.434569] MSR_AMD64_IBSDCPHYSAD 268483584 0
+amd48-systeme kernel: [ 2579.434570] MSR_AMD64_IBSOPCTL 925695 0
+		\end{verbatim}
