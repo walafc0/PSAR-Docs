@@ -286,13 +286,11 @@
 
       Un module est une partie du noyau que l'on peut facilement ajouter et/ou
       retirer pendant l'exécution de la machine sans pour autant devoir la
-      redémarrer. C'est une avancée énorme sur le noyau Linux et BSD et cela
-      implique un changement profond dans la définition du noyau: il n'est plus
-      \og monolithique\fg mais microlithique. {\color{red}TODO: c'est vraiment
-        utile ça ?  Parce que va falloir expliquer ce qu'est un kernel
-        mono/micro-lithique.} Les modules peuvent être de types très variés. Il
-      peuvent assurer le fonctionnement des périphériques wifi, usb,
-      l'utilisation de machine virtuelles\ldots  \newline
+      redémarrer. C'est une avancée énorme pour les noyaux Linux et BSD: ils
+      sont maintenant \textbf{modulaires}: il est possible de séparer les
+      parties fondamentales du noyau des autres. Les modules peuvent être de
+      types très variés. Il peuvent assurer le fonctionnement des périphériques
+      wifi, usb, l'utilisation de machine virtuelles\ldots \newline
 
       L'ajout de module se fait via les commandes \textbf{insmod} et
       \textbf{rmmod}. Il existe également un outil plus évolué appelé
@@ -304,8 +302,7 @@
       directement dans le noyau mais en utilisant un module, que nous
       chargons/déchargons à notre guise. Ainsi, il n'est pas nécessaire de
       recompiler un nouveau noyau et de le lancer sur une machine virtuelle à
-      chaque test. {\color{red}TODO: vérifier si c'est pas incohérent avec la
-        partie de Kevin.} En revanche, le fait de travailler directement sur le
+      chaque test. En revanche, le fait de travailler directement sur le
       noyau du Magny Cour implique que si nous le \og plantons\fg, il faudra
       aller redémarrer la machine dans la salle où elle se situe, au lieu de
       simplement redémarrer une machine virtuelle.
