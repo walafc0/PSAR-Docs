@@ -18,32 +18,28 @@
   \section{Architecture NUMA}
     \subsection{Présentation}
       \bframe
-        \begin{block}{Objectifs}
-          \begin{itemize}
-            \item accélerer les temps de traitement
-            \item répondre aux besoins d'applications spécifiques
-          \end{itemize}
-        \end{block}
-      \end{frame}
-
-      \bframe
-      \begin{columns}[T]
-        \begin{column}{.4\textwidth}
-        \begin{block}{Moyens mis en \oe uvre}
-          \begin{itemize}
-            \item découpe en noeuds
-            \item placement des contrôleurs d'E/S
-            \item liens d'interconnexions
-            \item mise en place d'une topologie
-          \end{itemize}
+        \begin{columns}[T]
+          \begin{column}{.5\textwidth}
+          \begin{block}{Objectifs}
+            \begin{itemize}
+              \item accélerer les temps de traitement
+              \item répondre aux besoins d'applications spécifiques
+            \end{itemize}
+          \end{block}
+          \begin{block}{Moyens mis en \oe uvre}
+            \begin{itemize}
+              \item découpe en noeuds
+              \item placement des contrôleurs d'E/S
+              \item liens d'interconnexions
+              \item mise en place d'une topologie
+            \end{itemize}
           \end{block}
         \end{column}
         \begin{column}{.5\textwidth}
           \myfig{0.4}{img/numa_arch_details.png}
         \end{column}
       \end{columns}
-
-      \end{frame}
+    \end{frame}
 
     \subsection{Enjeux}
       \bframe
@@ -58,7 +54,7 @@
   \section{Infrastructure de tests}
     \subsection{}
       \bframe
-        \begin{block}<1-2>{Un titre}
+        \begin{block}<1-2>{}
           \begin{itemize}
             \item utilisation mutualisée du Magny Cour $\rightarrow$ machines
               virtuelles
