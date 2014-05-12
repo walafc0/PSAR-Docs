@@ -3,42 +3,46 @@
       \begin{block}<1-2>{Problématique}
         \begin{itemize}
           \item architecture NUMA
-          \item placement mémoire
-          \item performances
+          \item systèmes non efficaces
+          \item gain de performances
         \end{itemize}
       \end{block}
       \begin{block}<2>{Objectifs}
         \begin{itemize}
           \item évaluation d'activité
           \item mesures d'évènements
-          \item étude comportementale
         \end{itemize}
       \end{block}
     \end{frame}
 
   \section{Architecture NUMA}
     \subsection{Présentation}
-
       \bframe
-        \begin{block}<1-2>{Objectifs}
+        \begin{block}{Objectifs}
           \begin{itemize}
             \item accélerer les temps de traitement
             \item répondre aux besoins d'applications spécifiques
           \end{itemize}
         \end{block}
-        \begin{block}<2>{Moyens mis en \oe uvre}
+      \end{frame}
+
+      \bframe
+      \begin{columns}[T]
+        \begin{column}{.4\textwidth}
+        \begin{block}{Moyens mis en \oe uvre}
           \begin{itemize}
             \item découpe en noeuds
             \item placement des contrôleurs d'E/S
             \item liens d'interconnexions
             \item mise en place d'une topologie
           \end{itemize}
-        \end{block}
-      \end{frame}
+          \end{block}
+        \end{column}
+        \begin{column}{.5\textwidth}
+          \myfig{0.4}{img/numa_arch_details.png}
+        \end{column}
+      \end{columns}
 
-    \subsection{Vue d'ensemble}
-      \bframe
-        \myfig{0.4}{img/numa_arch_details.png}
       \end{frame}
 
     \subsection{Enjeux}
